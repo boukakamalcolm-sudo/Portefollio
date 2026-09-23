@@ -11,14 +11,22 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const res = await fetch('/api/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    });
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        window.location.href = '/#work';
+        return;
+      }
+      const json = await res.json().catch(() => ({}));
+      setError(json.error || 'Mot de passe incorrect');
+    } catch {
+      setError('Connexion impossible, réessayez');
+    }
     setLoading(false);
-    if (res.ok) window.location.href = '/#work';
-    else setError('Mot de passe incorrect');
   }
 
   return (

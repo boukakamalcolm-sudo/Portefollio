@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { upload } from '@vercel/blob/client';
 import type { Project, ProjectFile } from '@/lib/types';
 
@@ -27,7 +27,23 @@ async function api(method: string, body: unknown) {
   return json.projects as Project[];
 }
 
-function Editor({ initial, onCancel, onSaved }: { initial: Project; onCancel: () => void; onSaved: (p: Project[]) => void }) {
+// Supprime côté serveur les fichiers envoyés mais finalement pas enregistrés
+function discardUploads(urls: string[]) {
+  if (!urls.length) return;
+  fetch('/api/upload', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ urls }),
+    keepalive: true,
+  }).catch(() => {});
+}
+
+function Editor({ initial, onCancel, onSaved, uploads }: {
+  initial: Project;
+  onCancel: () => void;
+  onSaved: (p: Project[]) => void;
+  uploads: React.MutableRefObject<string[]>;
+}) {
   const [p, setP] = useState<Project>(initial);
   const [tags, setTags] = useState(initial.tags.join(', '));
   const [uploading, setUploading] = useState<string | null>(null);
@@ -56,6 +72,7 @@ function Editor({ initial, onCancel, onSaved }: { initial: Project; onCancel: ()
           handleUploadUrl: '/api/upload',
           onUploadProgress: ({ percentage }) => setUploading(`Envoi de ${file.name} : ${Math.round(percentage)} %`),
         });
+        uploads.current.push(blob.url);
         added.push({ url: blob.url, name: file.name, kind: isPdf ? 'pdf' : 'image' });
       } catch (e) {
         setError(`${file.name} : ${(e as Error).message}`);
@@ -83,6 +100,9 @@ function Editor({ initial, onCancel, onSaved }: { initial: Project; onCancel: ()
         ...p,
         tags: tags.split(',').map((t) => t.trim().toUpperCase()).filter(Boolean),
       });
+      const kept = new Set(projects.flatMap((x) => x.files.map((f) => f.url)));
+      discardUploads(uploads.current.filter((u) => !kept.has(u)));
+      uploads.current = [];
       onSaved(projects);
     } catch (e) {
       setError((e as Error).message);
@@ -142,6 +162,42 @@ export default function AdminPanel({ projects, setProjects }: { projects: Projec
   const [editing, setEditing] = useState<Project | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const uploads = useRef<string[]>([]);
+  const gearRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+
+  function stopEditing() {
+    discardUploads(uploads.current);
+    uploads.current = [];
+    setEditing(null);
+  }
+
+  function closeDrawer() {
+    if (editing && !confirm('Fermer sans enregistrer ?')) return;
+    stopEditing();
+    setOpen(false);
+  }
+
+  const closeRef = useRef(closeDrawer);
+  closeRef.current = closeDrawer;
+
+  useEffect(() => {
+    if (!open) return;
+    const gear = gearRef.current;
+    drawerRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeRef.current();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => { window.removeEventListener('keydown', onKey); gear?.focus(); };
+  }, [open]);
+
+  // fichiers envoyés puis onglet fermé sans enregistrer
+  useEffect(() => {
+    const onHide = () => discardUploads(uploads.current);
+    window.addEventListener('pagehide', onHide);
+    return () => window.removeEventListener('pagehide', onHide);
+  }, []);
 
   async function run(fn: () => Promise<Project[]>) {
     setBusy(true);
@@ -175,7 +231,7 @@ export default function AdminPanel({ projects, setProjects }: { projects: Projec
 
   return (
     <>
-      <button className="gear" onClick={() => setOpen(true)} aria-label="Gérer les projets" title="Gérer les projets">
+      <button ref={gearRef} className="gear" onClick={() => setOpen(true)} aria-label="Gérer les projets" title="Gérer les projets">
         <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
           <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.62.06-.94s-.02-.63-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.92 2h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.72 8.47a.48.48 0 0 0 .12.61l2.03 1.58c-.05.31-.07.63-.07.94s.02.63.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z" />
         </svg>
@@ -183,19 +239,20 @@ export default function AdminPanel({ projects, setProjects }: { projects: Projec
 
       {open && (
         <div className="drawer-backdrop" onMouseDown={(e) => e.target === e.currentTarget && !editing && setOpen(false)}>
-          <aside className="drawer" role="dialog" aria-modal="true" aria-label="Gestion des projets">
+          <aside ref={drawerRef} tabIndex={-1} className="drawer" role="dialog" aria-modal="true" aria-label="Gestion des projets">
             <div className="drawer-head">
               <strong>PROJETS</strong>
               <div>
                 <button className="link" onClick={logout}>Déconnexion</button>
-                <button className="drawer-close" onClick={() => { setOpen(false); setEditing(null); }} aria-label="Fermer">×</button>
+                <button className="drawer-close" onClick={closeDrawer} aria-label="Fermer">×</button>
               </div>
             </div>
 
             {editing ? (
               <Editor
                 initial={editing}
-                onCancel={() => setEditing(null)}
+                uploads={uploads}
+                onCancel={stopEditing}
                 onSaved={(p) => { setProjects(p); setEditing(null); }}
               />
             ) : (

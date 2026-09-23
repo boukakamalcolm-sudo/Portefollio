@@ -1,9 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import type { Project } from '@/lib/types';
-import { CONTACT_EMAIL, LINKEDIN_URL } from '@/lib/config';
-import AdminPanel from './AdminPanel';
+import { BOOKING_URL, CONTACT_EMAIL, LEGAL_NAME, LINKEDIN_URL } from '@/lib/config';
+
+// chargé seulement pour l'admin connecté
+const AdminPanel = dynamic(() => import('./AdminPanel'));
 
 const PAINS = [
   'Le stock ne correspond jamais à ce qu’il y a vraiment en rayon.',
@@ -48,8 +52,7 @@ function Cover({ project, index }: { project: Project; index: number }) {
   if (img) {
     return (
       <div className={`project-visual ${accent}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={img.url} alt="" className="cover-img" loading="lazy" draggable={false} />
+        <Image src={img.url} alt="" fill className="cover-img" sizes="(max-width: 900px) 84vw, 44vw" draggable={false} />
         <span className="visual-label">{pad(index + 1)} / {project.title.toUpperCase()}</span>
       </div>
     );
@@ -142,32 +145,37 @@ function Carousel({ projects, onOpen }: { projects: Project[]; onOpen: (i: numbe
         onPointerUp={endDrag}
         onPointerLeave={endDrag}
         tabIndex={0}
-        aria-label="Réalisations, faire défiler horizontalement"
+        role="region"
+        aria-label="Réalisations, faire défiler avec les flèches du clavier"
         onKeyDown={(e) => {
           if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
           if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
         }}
       >
         {projects.map((p, i) => (
-          <button
-            className="project-card"
-            key={p.id}
-            onClick={(e) => {
-              if (drag.current.moved) { e.preventDefault(); drag.current.moved = false; return; }
-              onOpen(i);
-            }}
-          >
+          <article className="project-card" key={p.id}>
             <Cover project={p} index={i} />
             <div className="project-info">
               <div>
                 <span className="project-number">{pad(i + 1)} · {p.sector.toUpperCase()}</span>
-                <h3>{p.title.toUpperCase()}</h3>
+                <h3>
+                  {/* le bouton couvre toute la carte (voir .project-open::after) */}
+                  <button
+                    className="project-open"
+                    onClick={(e) => {
+                      if (drag.current.moved) { e.preventDefault(); drag.current.moved = false; return; }
+                      onOpen(i);
+                    }}
+                  >
+                    {p.title.toUpperCase()}
+                  </button>
+                </h3>
                 <p>{p.subtitle}</p>
               </div>
-              <span className="view">VOIR ↗</span>
+              <span className="view" aria-hidden="true">VOIR ↗</span>
             </div>
             <div className="tags">{p.tags.map((t) => <span key={t}>{t}</span>)}</div>
-          </button>
+          </article>
         ))}
       </div>
       <div className="carousel-controls">
@@ -182,25 +190,54 @@ function Carousel({ projects, onOpen }: { projects: Project[]; onOpen: (i: numbe
   );
 }
 
+const FOCUSABLE = 'a[href], button:not([disabled]), iframe, input, textarea, select, [tabindex]:not([tabindex="-1"])';
+
+// garde le focus clavier dans la fenêtre ouverte
+function trapTab(e: KeyboardEvent, root: HTMLElement | null) {
+  if (e.key !== 'Tab' || !root) return;
+  const items = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE));
+  if (!items.length) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (e.shiftKey && (document.activeElement === first || !root.contains(document.activeElement))) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && (document.activeElement === last || !root.contains(document.activeElement))) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
 function CaseModal({ project, index, onClose }: { project: Project; index: number; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
-  const [zoom, setZoom] = useState<string | null>(null);
+  const modalRef = useRef<HTMLElement>(null);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState<{ url: string; alt: string } | null>(null);
   const images = project.files.filter((f) => f.kind === 'image');
   const pdfs = project.files.filter((f) => f.kind === 'pdf');
 
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
+    return () => prev?.focus();
+  }, []);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') (zoom ? setZoom(null) : onClose());
+      trapTab(e, zoom ? lightboxRef.current : modalRef.current);
     };
     window.addEventListener('keydown', onKey);
-    return () => { window.removeEventListener('keydown', onKey); prev?.focus(); };
+    return () => window.removeEventListener('keydown', onKey);
   }, [onClose, zoom]);
+
+  useEffect(() => {
+    if (zoom) lightboxRef.current?.querySelector('button')?.focus();
+  }, [zoom]);
 
   return (
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <article className="modal" role="dialog" aria-modal="true" aria-labelledby="case-title">
+      <article ref={modalRef} className="modal" role="dialog" aria-modal="true" aria-labelledby="case-title">
         <button ref={closeRef} className="modal-close" onClick={onClose} aria-label="Fermer">×</button>
         <div className="modal-hero">
           <span>{pad(index + 1)} / {project.sector.toUpperCase()}</span>
@@ -217,12 +254,20 @@ function CaseModal({ project, index, onClose }: { project: Project; index: numbe
           <section className="case-block">
             <small>CAPTURES</small>
             <div className="gallery">
-              {images.map((f) => (
-                <button key={f.url} onClick={() => setZoom(f.url)} aria-label={`Agrandir ${f.name}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={f.url} alt={f.name} loading="lazy" />
-                </button>
-              ))}
+              {images.map((f, i) => {
+                const alt = `${project.title}, capture ${i + 1} sur ${images.length}`;
+                return (
+                  <button key={f.url} onClick={() => setZoom({ url: f.url, alt })} aria-label={`Agrandir : ${alt}`}>
+                    <Image
+                      src={f.url}
+                      alt={alt}
+                      width={1200}
+                      height={800}
+                      sizes={images.length === 1 ? '(max-width: 1300px) 90vw, 1150px' : '(max-width: 900px) 90vw, 400px'}
+                    />
+                  </button>
+                );
+              })}
             </div>
           </section>
         )}
@@ -253,18 +298,45 @@ function CaseModal({ project, index, onClose }: { project: Project; index: numbe
       </article>
 
       {zoom && (
-        <div className="lightbox" onClick={() => setZoom(null)} role="dialog" aria-label="Image agrandie">
+        <div ref={lightboxRef} className="lightbox" onClick={() => setZoom(null)} role="dialog" aria-modal="true" aria-label="Image agrandie">
+          <button className="lightbox-close" onClick={() => setZoom(null)} aria-label="Fermer l’image">×</button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={zoom} alt="" />
+          <img src={zoom.url} alt={zoom.alt} />
         </div>
       )}
     </div>
   );
 }
 
-export default function Site({ initialProjects, admin }: { initialProjects: Project[]; admin: boolean }) {
+export default function Site({ initialProjects }: { initialProjects: Project[] }) {
   const [projects, setProjects] = useState(initialProjects);
   const [active, setActive] = useState<number | null>(null);
+  const [admin, setAdmin] = useState(false);
+  const [menu, setMenu] = useState(false);
+
+  // la page est statique : le statut admin est lu après chargement
+  useEffect(() => {
+    fetch('/api/auth', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : { admin: false }))
+      .then((j) => setAdmin(!!j.admin))
+      .catch(() => {});
+  }, []);
+
+  // la version publique peut dater d'avant la dernière modification : l'admin voit la liste à jour
+  useEffect(() => {
+    if (!admin) return;
+    fetch('/api/projects', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => j?.projects && setProjects(j.projects))
+      .catch(() => {});
+  }, [admin]);
+
+  useEffect(() => {
+    if (!menu) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenu(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menu]);
 
   useEffect(() => {
     document.body.style.overflow = active !== null ? 'hidden' : '';
@@ -277,11 +349,16 @@ export default function Site({ initialProjects, admin }: { initialProjects: Proj
   return (
     <main>
       <nav className="nav">
-        <a className="brand" href="#top">MB<span>.</span></a>
-        <div className="nav-links">
+        <a className="brand" href="#top" aria-label="Malcolm Boukaka, retour en haut">MB<span>.</span></a>
+        <div className={`nav-links${menu ? ' open' : ''}`} id="menu" onClick={() => setMenu(false)}>
           <a href="#offre">OFFRE</a><a href="#work">RÉALISATIONS</a><a href="#methode">MÉTHODE</a><a href="#contact">CONTACT</a>
         </div>
-        <a className="nav-cta" href="#contact">PARLONS-EN ↗</a>
+        <div className="nav-end">
+          <a className="nav-cta" href="#contact">PARLONS-EN ↗</a>
+          <button className="nav-toggle" aria-expanded={menu} aria-controls="menu" onClick={() => setMenu(!menu)}>
+            {menu ? 'FERMER' : 'MENU'}
+          </button>
+        </div>
       </nav>
 
       <section className="hero" id="top">
@@ -324,7 +401,7 @@ export default function Site({ initialProjects, admin }: { initialProjects: Proj
       <section className="work section-pad" id="work">
         <div className="section-heading">
           <span>03 / 05</span>
-          <h2>RÉALI<br /><em>SATIONS</em></h2>
+          <h2 aria-label="Réalisations"><span aria-hidden="true">RÉALI<br /><em>SATIONS</em></span></h2>
           <p>Des cas concrets. Faites défiler, cliquez pour ouvrir.</p>
         </div>
         <Carousel projects={projects} onOpen={setActive} />
@@ -335,7 +412,7 @@ export default function Site({ initialProjects, admin }: { initialProjects: Proj
         <div className="process-head"><p className="eyebrow">MA MÉTHODE</p><h2>SIMPLE,<br /><em>ET ÇA TIENT.</em></h2></div>
         <div className="process-list">
           {STEPS.map(([t, d], i) => (
-            <div className="process-item" key={t}><span>{pad(i + 1)}</span><strong>{t}</strong><small>{d}</small><b>↗</b></div>
+            <div className="process-item" key={t}><span>{pad(i + 1)}</span><strong>{t}</strong><small>{d}</small></div>
           ))}
         </div>
       </section>
@@ -346,15 +423,17 @@ export default function Site({ initialProjects, admin }: { initialProjects: Proj
         <div className="contact-bottom">
           <p>30 minutes pour comprendre votre activité et voir si je peux vous aider. Sans engagement.</p>
           <div className="contact-links">
+            {BOOKING_URL && <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">RÉSERVER 30 MIN ↗</a>}
             {LINKEDIN_URL && <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LINKEDIN ↗</a>}
-            <a href={`mailto:${CONTACT_EMAIL}`}>ME CONTACTER ↗</a>
+            <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Premier échange')}`}>ME CONTACTER ↗</a>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="contact-email">{CONTACT_EMAIL}</a>
           </div>
         </div>
       </section>
 
       <footer>
-        <span>© {new Date().getFullYear()} MALCOLM BOUKAKA-MASSENGO</span>
-        <span>OUTILS SUR MESURE POUR PME</span>
+        <span>© {new Date().getFullYear()} {LEGAL_NAME.toUpperCase()}</span>
+        <a href="/mentions-legales">MENTIONS LÉGALES</a>
         <a href="#top">HAUT DE PAGE ↑</a>
       </footer>
 

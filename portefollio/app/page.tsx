@@ -1,10 +1,11 @@
 import Site from '@/components/Site';
 import { getProjects } from '@/lib/store';
-import { isAdmin } from '@/lib/auth';
 
-export const dynamic = 'force-dynamic';
+// Page statique, régénérée quand un projet est enregistré (revalidateTag dans lib/store.ts).
+// Filet de sécurité : régénération au plus toutes les heures.
+export const revalidate = 3600;
 
 export default async function Page() {
-  const [projects, admin] = await Promise.all([getProjects(), isAdmin()]);
-  return <Site initialProjects={projects} admin={admin} />;
+  const projects = await getProjects();
+  return <Site initialProjects={projects} />;
 }

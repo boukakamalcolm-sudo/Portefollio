@@ -13,7 +13,7 @@ export const seedProjects: Project[] = [
     solution:
       'Une application web simple, utilisable sur téléphone : produits, approvisionnements, ventes, dépenses, caisse et alertes de stock. Des accès différents pour le gérant et les vendeurs.',
     result:
-      'Le stock, les ventes et la caisse sont consultables à tout moment, y compris à distance. À compléter avec les chiffres réels : temps gagné, écarts de caisse, ruptures évitées.',
+      'Le stock, les ventes et la caisse sont consultables à tout moment, y compris à distance. Le gérant sait chaque soir ce qui a été vendu, ce qui reste en rayon et ce qu’il y a réellement en caisse.',
     files: [],
   },
   {
@@ -38,7 +38,7 @@ export const seedProjects: Project[] = [
     problem:
       'Des dizaines d’outils utilisés sans vue d’ensemble, des doublons, des fichiers maison que personne ne maîtrise.',
     solution:
-      'Recensement des applications sur 18 sites, repérage des outils « officieux », restitution claire pour décider quoi garder, remplacer ou supprimer.',
+      'Recensement des applications dans les 18 entités, repérage des outils « officieux », restitution claire pour décider quoi garder, remplacer ou supprimer.',
     result: 'Une carte lisible des outils, qui sert de base aux décisions d’investissement.',
     files: [],
   },

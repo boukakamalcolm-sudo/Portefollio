@@ -10,50 +10,53 @@ import { BOOKING_URL, CONTACT_EMAIL, LEGAL_NAME, LINKEDIN_URL } from '@/lib/conf
 const AdminPanel = dynamic(() => import('./AdminPanel'));
 
 const PAINS = [
-  'Le stock ne correspond jamais à ce qu’il y a vraiment en rayon.',
-  'Vos infos clients sont éparpillées entre Excel, WhatsApp et des carnets.',
-  'Vous passez vos soirées sur l’administratif au lieu de développer l’activité.',
+  'La même information est saisie trois fois, à trois endroits différents.',
+  'Pour savoir où en est une commande ou un dossier, il faut appeler quelqu’un.',
+  'Tout repose sur un fichier Excel que seule une personne comprend vraiment.',
   'Vous ne savez pas ce que vous avez réellement gagné ce mois-ci.',
 ];
 
 const OFFERS = [
   {
     n: '01',
-    title: 'DIAGNOSTIC',
+    title: 'Diagnostic',
     text: 'On regarde ensemble comment vous travaillez aujourd’hui et où part le temps. Vous repartez avec un plan clair, même si on ne va pas plus loin.',
     tags: ['1 À 2 JOURS', 'PLAN D’ACTION'],
   },
   {
     n: '02',
-    title: 'OUTIL SUR MESURE',
-    text: 'Une application web simple, pensée pour votre activité : stock, caisse, clients, commandes, tableaux de bord. Utilisable sur téléphone.',
-    tags: ['STOCK', 'CAISSE', 'CRM', 'SUIVI'],
+    title: 'Outil sur mesure',
+    text: 'Une application web simple, pensée pour votre activité : devis, commandes, planning, suivi clients, tableaux de bord. Utilisable sur téléphone.',
+    tags: ['DEVIS', 'PLANNING', 'SUIVI', 'TABLEAUX DE BORD'],
   },
   {
     n: '03',
-    title: 'MISE EN ROUTE',
+    title: 'Mise en route',
     text: 'Formation de l’équipe, ajustements après les premières semaines, suivi. Un outil ne sert à rien si personne ne l’utilise.',
     tags: ['FORMATION', 'ADOPTION', 'SUIVI'],
   },
 ];
 
 const STEPS = [
-  ['ÉCOUTER', 'Votre métier, vos contraintes, ce qui vous fait perdre du temps'],
-  ['CARTOGRAPHIER', 'Qui fait quoi, avec quels outils, où ça coince'],
-  ['CONSTRUIRE', 'Un outil simple, testé avec vous au fur et à mesure'],
-  ['ACCOMPAGNER', 'Formation, ajustements, suivi dans la durée'],
+  ['Écouter', 'Votre métier, vos contraintes, ce qui vous fait perdre du temps'],
+  ['Cartographier', 'Qui fait quoi, avec quels outils, où ça coince'],
+  ['Construire', 'Un outil simple, testé avec vous au fur et à mesure'],
+  ['Accompagner', 'Formation, ajustements, suivi dans la durée'],
 ];
+
+const CONTACT_HREF = BOOKING_URL || `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Premier échange')}`;
+const CONTACT_TARGET = BOOKING_URL ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
 function Cover({ project, index }: { project: Project; index: number }) {
   const img = project.files.find((f) => f.kind === 'image');
-  const accent = ['red', 'dark', 'cream'][index % 3];
+  const accent = ['yellow', 'dark', 'grey'][index % 3];
   if (img) {
     return (
       <div className={`project-visual ${accent}`}>
         <Image src={img.url} alt="" fill className="cover-img" sizes="(max-width: 900px) 84vw, 44vw" draggable={false} />
-        <span className="visual-label">{pad(index + 1)} / {project.title.toUpperCase()}</span>
+        <span className="visual-label">{pad(index + 1)} / {project.title}</span>
       </div>
     );
   }
@@ -71,7 +74,7 @@ function Cover({ project, index }: { project: Project; index: number }) {
           </div>
         </div>
       </div>
-      <span className="visual-label">{pad(index + 1)} / {project.title.toUpperCase()}</span>
+      <span className="visual-label">{pad(index + 1)} / {project.title}</span>
     </div>
   );
 }
@@ -157,7 +160,7 @@ function Carousel({ projects, onOpen }: { projects: Project[]; onOpen: (i: numbe
             <Cover project={p} index={i} />
             <div className="project-info">
               <div>
-                <span className="project-number">{pad(i + 1)} · {p.sector.toUpperCase()}</span>
+                <span className="project-number">{pad(i + 1)} · {p.sector}</span>
                 <h3>
                   {/* le bouton couvre toute la carte (voir .project-open::after) */}
                   <button
@@ -167,12 +170,12 @@ function Carousel({ projects, onOpen }: { projects: Project[]; onOpen: (i: numbe
                       onOpen(i);
                     }}
                   >
-                    {p.title.toUpperCase()}
+                    {p.title}
                   </button>
                 </h3>
                 <p>{p.subtitle}</p>
               </div>
-              <span className="view" aria-hidden="true">VOIR ↗</span>
+              <span className="view" aria-hidden="true">Voir ↗</span>
             </div>
             <div className="tags">{p.tags.map((t) => <span key={t}>{t}</span>)}</div>
           </article>
@@ -240,8 +243,8 @@ function CaseModal({ project, index, onClose }: { project: Project; index: numbe
       <article ref={modalRef} className="modal" role="dialog" aria-modal="true" aria-labelledby="case-title">
         <button ref={closeRef} className="modal-close" onClick={onClose} aria-label="Fermer">×</button>
         <div className="modal-hero">
-          <span>{pad(index + 1)} / {project.sector.toUpperCase()}</span>
-          <h2 id="case-title">{project.title.toUpperCase()}</h2>
+          <span>{pad(index + 1)} / {project.sector}</span>
+          <h2 id="case-title">{project.title}</h2>
           <p>{project.subtitle}</p>
         </div>
 
@@ -289,10 +292,10 @@ function CaseModal({ project, index, onClose }: { project: Project; index: numbe
 
         <div className="case-result">
           <small>LE RÉSULTAT</small>
-          <h3>CE QUI A CHANGÉ</h3>
+          <h3>Ce qui a changé</h3>
           <p>{project.result}</p>
           <a className="result-cta" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Un projet comme ' + project.title)}`}>
-            UN BESOIN SIMILAIRE ? PARLONS-EN ↗
+            Un besoin similaire ? Parlons-en →
           </a>
         </div>
       </article>
@@ -351,45 +354,67 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
       <nav className="nav">
         <a className="brand" href="#top" aria-label="Malcolm Boukaka, retour en haut">MB<span>.</span></a>
         <div className={`nav-links${menu ? ' open' : ''}`} id="menu" onClick={() => setMenu(false)}>
-          <a href="#offre">OFFRE</a><a href="#work">RÉALISATIONS</a><a href="#methode">MÉTHODE</a><a href="#contact">CONTACT</a>
+          <a href="#offre">Offre</a><a href="#work">Réalisations</a><a href="#methode">Méthode</a><a href="#contact">Contact</a>
         </div>
         <div className="nav-end">
-          <a className="nav-cta" href="#contact">PARLONS-EN ↗</a>
+          <a className="nav-cta" href="#contact">Parlons-en →</a>
           <button className="nav-toggle" aria-expanded={menu} aria-controls="menu" onClick={() => setMenu(!menu)}>
-            {menu ? 'FERMER' : 'MENU'}
+            {menu ? 'Fermer' : 'Menu'}
           </button>
         </div>
       </nav>
 
       <section className="hero" id="top">
-        <div className="hero-meta"><span>OUTILS SUR MESURE POUR PME</span><span>PARIS / À DISTANCE</span></div>
-        <h1 className="hero-title"><span>MOINS</span><span>D’EXCEL.</span><span className="outline">PLUS DE TEMPS.</span></h1>
-        <div className="hero-bottom">
-          <p>Stock, caisse, clients, suivi : je transforme vos fichiers Excel et vos groupes WhatsApp en un outil simple, que votre équipe utilise vraiment.</p>
-          <a className="arrow-link" href="#work">VOIR DES EXEMPLES <span>↘</span></a>
+        <div className="hero-text">
+          <p className="label">Outils sur mesure pour PME · Paris / à distance</p>
+          <h1 className="hero-title">Moins d’Excel.<br />Plus de <mark>temps.</mark></h1>
+          <p className="hero-sub">
+            Devis, commandes, plannings, suivi clients : je remplace vos fichiers Excel, vos papiers et vos groupes
+            WhatsApp par un outil simple, que votre équipe utilise vraiment.
+          </p>
+          <div className="hero-actions">
+            <a className="btn-primary" href={CONTACT_HREF} {...CONTACT_TARGET}>
+              Parlons de votre projet →
+            </a>
+            <a className="btn-link" href="#work">Voir des exemples ↘</a>
+          </div>
         </div>
-        <div className="hero-block" />
+        <div className="hero-card">
+          <div className="hero-photo">
+            <Image src="/malcolm.jpg" alt="Malcolm Boukaka" width={552} height={552} priority sizes="(max-width: 900px) 60vw, 340px" />
+          </div>
+          <p className="hero-flow" aria-label="Du papier à Excel, puis à un outil sur mesure">
+            <span>Papier</span><b aria-hidden="true">→</b><span>Excel</span><b aria-hidden="true">→</b><span>Outil</span>
+          </p>
+          <p className="hero-name"><strong>Malcolm Boukaka</strong><br />Je simplifie le quotidien des PME</p>
+        </div>
       </section>
 
-      <section className="pains section-pad">
-        <div className="section-index">01 / 05</div>
-        <div>
-          <p className="eyebrow">ÇA VOUS PARLE ?</p>
-          <h2>VOTRE ACTIVITÉ<br /><em>TOURNE À LA MAIN.</em></h2>
+      <section className="pains block yellow">
+        <header className="block-head">
+          <p className="label">01 — Ça vous parle ?</p>
+          <h2>Votre activité tourne <mark>à la main.</mark></h2>
+        </header>
+        <div className="pain-grid">
+          <p className="pain-lead">
+            Ce n’est pas un problème de logiciel. C’est un problème d’organisation que personne n’a pris le temps de
+            poser à plat. C’est là que j’interviens.
+          </p>
           <ul className="pain-list">
-            {PAINS.map((p, i) => <li key={p}><span>{pad(i + 1)}</span>{p}</li>)}
+            {PAINS.map((p, i) => <li key={p}><span className="label">{pad(i + 1)}</span>{p}</li>)}
           </ul>
-          <p className="lead">Ce n’est pas un problème de logiciel. C’est un problème d’organisation que personne n’a pris le temps de poser à plat. C’est là que j’interviens.</p>
         </div>
       </section>
 
-      <section className="offer section-pad" id="offre">
-        <div className="section-index">02 / 05</div>
-        <div className="offer-head"><p className="eyebrow">CE QUE JE FAIS</p><h2>DU BRICOLAGE<br /><em>À L’OUTIL.</em></h2></div>
+      <section className="offer block" id="offre">
+        <header className="block-head">
+          <p className="label">02 — Ce que je fais</p>
+          <h2>Du bricolage à l’outil.</h2>
+        </header>
         <div className="offer-grid">
           {OFFERS.map((o) => (
             <div className="offer-card" key={o.n}>
-              <span>{o.n}</span>
+              <span className="label">{o.n}</span>
               <h3>{o.title}</h3>
               <p>{o.text}</p>
               <div className="tags">{o.tags.map((t) => <span key={t}>{t}</span>)}</div>
@@ -398,43 +423,50 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
         </div>
       </section>
 
-      <section className="work section-pad" id="work">
-        <div className="section-heading">
-          <span>03 / 05</span>
-          <h2 aria-label="Réalisations"><span aria-hidden="true">RÉALI<br /><em>SATIONS</em></span></h2>
-          <p>Des cas concrets. Faites défiler, cliquez pour ouvrir.</p>
-        </div>
+      <section className="work block grey" id="work">
+        <header className="block-head">
+          <p className="label">03 — Réalisations</p>
+          <h2>Des cas concrets.</h2>
+          <p className="block-intro">Faites défiler, cliquez pour ouvrir.</p>
+        </header>
         <Carousel projects={projects} onOpen={setActive} />
       </section>
 
-      <section className="process section-pad" id="methode">
-        <div className="section-index">04 / 05</div>
-        <div className="process-head"><p className="eyebrow">MA MÉTHODE</p><h2>SIMPLE,<br /><em>ET ÇA TIENT.</em></h2></div>
-        <div className="process-list">
-          {STEPS.map(([t, d], i) => (
-            <div className="process-item" key={t}><span>{pad(i + 1)}</span><strong>{t}</strong><small>{d}</small></div>
-          ))}
+      <section className="process block" id="methode">
+        <div className="process-grid">
+          <header className="block-head">
+            <p className="label">04 — Ma méthode</p>
+            <h2>Simple, et ça tient.</h2>
+          </header>
+          <ol className="process-list">
+            {STEPS.map(([t, d], i) => (
+              <li key={t}><span className="label">{i + 1}.</span><strong>{t}</strong><small>{d}</small></li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      <section className="contact section-pad" id="contact">
-        <div className="contact-top"><span>05 / 05</span><span>PREMIER ÉCHANGE OFFERT</span></div>
-        <h2>ON EN<br /><em>PARLE ?</em></h2>
-        <div className="contact-bottom">
+      <section className="contact block yellow" id="contact">
+        <header className="block-head">
+          <p className="label">05 — Premier échange offert</p>
+          <h2>On en parle ?</h2>
+        </header>
+        <div className="contact-grid">
           <p>30 minutes pour comprendre votre activité et voir si je peux vous aider. Sans engagement.</p>
           <div className="contact-links">
-            {BOOKING_URL && <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">RÉSERVER 30 MIN ↗</a>}
-            {LINKEDIN_URL && <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LINKEDIN ↗</a>}
-            <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Premier échange')}`}>ME CONTACTER ↗</a>
-            <a href={`mailto:${CONTACT_EMAIL}`} className="contact-email">{CONTACT_EMAIL}</a>
+            <a className="btn-primary" href={CONTACT_HREF} {...CONTACT_TARGET}>
+              {BOOKING_URL ? 'Réserver 30 minutes →' : 'Parlons de votre projet →'}
+            </a>
+            <a className="contact-email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+            {LINKEDIN_URL && <a className="btn-link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>}
           </div>
         </div>
       </section>
 
       <footer>
-        <span>© {new Date().getFullYear()} {LEGAL_NAME.toUpperCase()}</span>
-        <a href="/mentions-legales">MENTIONS LÉGALES</a>
-        <a href="#top">HAUT DE PAGE ↑</a>
+        <span>© {new Date().getFullYear()} {LEGAL_NAME}</span>
+        <a href="/mentions-legales">Mentions légales</a>
+        <a href="#top">Haut de page ↑</a>
       </footer>
 
       {activeProject && <CaseModal project={activeProject} index={active!} onClose={close} />}

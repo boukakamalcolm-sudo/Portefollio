@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from 'next';
-import '@fontsource/barlow-condensed/700.css';
-import '@fontsource/barlow-condensed/800.css';
-import '@fontsource-variable/inter';
+import '@fontsource/outfit/400.css';
+import '@fontsource/outfit/500.css';
+import '@fontsource/outfit/600.css';
+import '@fontsource/ibm-plex-mono/400.css';
 import './globals.css';
 import { SITE_NAME, SITE_URL } from '@/lib/config';
 
 const title = `${SITE_NAME} · Outils sur mesure pour PME`;
 const description =
-  'Je transforme vos fichiers Excel et vos groupes WhatsApp en un outil simple que votre équipe utilise vraiment : stock, caisse, clients, suivi.';
+  'Je simplifie le quotidien des PME : devis, commandes, plannings, suivi clients. Moins de papier, moins de ressaisie, vos process dématérialisés dans un outil simple que votre équipe utilise vraiment.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title, description },
 };
 
-export const viewport: Viewport = { themeColor: '#f5efdc' };
+export const viewport: Viewport = { themeColor: '#f4f2f1' };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

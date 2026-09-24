@@ -10,7 +10,7 @@ export default function MentionsLegales() {
   return (
     <main className="legal">
       <a href="/" className="brand">MB<span>.</span></a>
-      <h1>MENTIONS<br />LÉGALES</h1>
+      <h1>Mentions légales</h1>
 
       <h2>ÉDITEUR DU SITE</h2>
       <p>{LEGAL_NAME}{LEGAL.status && ` · ${LEGAL.status}`}</p>

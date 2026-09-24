@@ -33,7 +33,7 @@ export default function AdminLogin() {
     <main className="login">
       <form onSubmit={submit} className="login-box">
         <a href="/" className="brand">MB<span>.</span></a>
-        <h1>ESPACE<br /><em>ADMIN</em></h1>
+        <h1>Espace<br /><em>admin</em></h1>
         <label htmlFor="pw">Mot de passe</label>
         <input id="pw" type="password" autoFocus autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && <p className="form-error" role="alert">{error}</p>}

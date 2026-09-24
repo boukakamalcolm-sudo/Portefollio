@@ -1,20 +1,19 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import type { Project } from '@/lib/types';
 import { BOOKING_URL, CONTACT_EMAIL, LEGAL_NAME, LINKEDIN_URL } from '@/lib/config';
 import ContactForm from './ContactForm';
+import HeroDash from './HeroDash';
+import { CountUp } from './motion';
 
-// chargé seulement pour l'admin connecté
-const AdminPanel = dynamic(() => import('./AdminPanel'));
 
 const PAINS = [
-  'La même information est saisie trois fois, à trois endroits différents.',
-  'Pour savoir où en est une commande ou un dossier, il faut appeler quelqu’un.',
-  'Tout repose sur un fichier Excel que seule une personne comprend vraiment.',
-  'Vous ne savez pas ce que vous avez réellement gagné ce mois-ci.',
+  ['La même information est saisie trois fois, à trois endroits différents.', 'Une seule saisie, visible par tous, partout.'],
+  ['Pour savoir où en est une commande ou un dossier, il faut appeler quelqu’un.', 'Chacun voit l’avancement en temps réel, sans décrocher son téléphone.'],
+  ['Tout repose sur un fichier Excel que seule une personne comprend vraiment.', 'Un outil clair que toute l’équipe sait utiliser, même en son absence.'],
+  ['Vous ne savez pas ce que vous avez réellement gagné ce mois-ci.', 'Vos ventes, vos dépenses et votre marge à jour, en un coup d’œil.'],
 ];
 
 const OFFERS = [
@@ -66,11 +65,24 @@ const XP = [
   },
 ];
 
-const FIGURES = [
-  ['89', 'musées équipés d’un nouvel outil, utilisé à 100 %'],
-  ['550', 'utilisateurs accompagnés sur Teams et SharePoint'],
-  ['50', 'applications cartographiées dans 18 directions régionales'],
+const FIGURES: [number, string][] = [
+  [89, 'musées équipés d’un nouvel outil, utilisé à 100 %'],
+  [550, 'utilisateurs accompagnés sur Teams et SharePoint'],
+  [50, 'applications cartographiées dans 18 directions régionales'],
 ];
+
+function PainCard({ pain, fix, index }: { pain: string; fix: string; index: number }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <li>
+      <button className={`pain-card${open ? ' open' : ''}`} aria-pressed={open} onClick={() => setOpen(!open)}>
+        <span className="label">{pad(index + 1)}</span>
+        <span className="pain-text">{pain}</span>
+        <span className="pain-fix"><b aria-hidden="true">✓</b> {fix}</span>
+      </button>
+    </li>
+  );
+}
 
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -338,7 +350,7 @@ function CaseModal({ project, index, onClose }: { project: Project; index: numbe
 }
 
 export default function Site({ initialProjects }: { initialProjects: Project[] }) {
-  const [projects, setProjects] = useState(initialProjects);
+  const [projects] = useState(initialProjects);
   const [active, setActive] = useState<number | null>(null);
   const [admin, setAdmin] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -351,14 +363,21 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
       .catch(() => {});
   }, []);
 
-  // la version publique peut dater d'avant la dernière modification : l'admin voit la liste à jour
+
+  // surligneurs qui se dessinent à l'arrivée à l'écran
   useEffect(() => {
-    if (!admin) return;
-    fetch('/api/projects', { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => j?.projects && setProjects(j.projects))
-      .catch(() => {});
-  }, [admin]);
+    const els = document.querySelectorAll('[data-reveal]');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.6 });
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!menu) return;
@@ -393,7 +412,7 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
       <section className="hero" id="top">
         <div className="hero-text">
           <p className="label">Outils sur mesure pour PME · Paris / à distance</p>
-          <h1 className="hero-title">Moins d’Excel.<br />Plus de <mark>temps.</mark></h1>
+          <h1 className="hero-title" data-reveal>Moins d’Excel.<br />Plus de <mark>temps.</mark></h1>
           <p className="hero-sub">
             Devis, commandes, plannings, suivi clients : je remplace vos fichiers Excel, vos papiers et vos groupes
             WhatsApp par un outil simple, que votre équipe utilise vraiment.
@@ -406,16 +425,7 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
           </div>
         </div>
         <div className="hero-card" aria-hidden="true">
-          <div className="dash">
-            <div className="dash-top"><span /><span /><span /><em>Tableau de bord · exemple</em></div>
-            <div className="dash-grid">
-              <div><small>Commandes du jour</small><strong>12</strong><i>+3 depuis hier</i></div>
-              <div><small>Devis à relancer</small><strong>3</strong><i>dont 1 urgent</i></div>
-              <div><small>Planning équipe</small><strong>5 / 5</strong><i>tout le monde est placé</i></div>
-              <div><small>Chiffre du mois</small><strong>8 450 €</strong><i>▲ 12 %</i></div>
-            </div>
-            <div className="dash-chart"><span /><span /><span /><span /><span /><span /><span /></div>
-          </div>
+          <HeroDash />
           <p className="hero-flow">
             <span>Papier</span><b>→</b><span>Excel</span><b>→</b><span>Outil</span>
           </p>
@@ -425,7 +435,8 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
       <section className="pains block yellow">
         <header className="block-head">
           <p className="label">01 — Ça vous parle ?</p>
-          <h2>Votre activité tourne <mark>à la main.</mark></h2>
+          <h2 data-reveal>Votre activité tourne <mark>à la main.</mark></h2>
+          <p className="block-intro pain-hint">Survolez ou touchez une case pour voir ce qui change avec un bon outil.</p>
         </header>
         <div className="pain-grid">
           <p className="pain-lead">
@@ -433,7 +444,7 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
             poser à plat. C’est là que j’interviens.
           </p>
           <ul className="pain-list">
-            {PAINS.map((p, i) => <li key={p}><span className="label">{pad(i + 1)}</span>{p}</li>)}
+            {PAINS.map(([pain, fix], i) => <PainCard key={pain} pain={pain} fix={fix} index={i} />)}
           </ul>
         </div>
       </section>
@@ -495,7 +506,7 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
               Aujourd’hui, je mets cette méthode au service des PME.
             </p>
             <div className="figures">
-              {FIGURES.map(([n, t]) => <div key={n}><strong>{n}</strong><span>{t}</span></div>)}
+              {FIGURES.map(([n, t]) => <div key={n}><strong><CountUp value={n} /></strong><span>{t}</span></div>)}
             </div>
             <ol className="xp">
               {XP.map((x) => (
@@ -543,7 +554,13 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
       </footer>
 
       {activeProject && <CaseModal project={activeProject} index={active!} onClose={close} />}
-      {admin && <AdminPanel projects={projects} setProjects={setProjects} />}
+      {admin && (
+        <a className="gear" href="/admin" aria-label="Gérer les projets" title="Gérer les projets">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+            <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.62.06-.94s-.02-.63-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.92 2h-3.840a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.72 8.470a.48.48 0 0 0 .12.61l2.03 1.58c-.05.31-.07.63-.07.94s.02.63.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.620-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z" />
+          </svg>
+        </a>
+      )}
     </main>
   );
 }

@@ -2,6 +2,31 @@
 
 import { useState } from 'react';
 import { CONTACT_EMAIL } from '@/lib/config';
+import { reducedMotion } from './motion';
+
+// confettis jaunes et noirs, en CSS pur, retirés après l'animation
+function Confetti() {
+  const [pieces] = useState(() =>
+    Array.from({ length: 36 }, (_, i) => ({
+      left: Math.random() * 100,
+      delay: Math.random() * 0.25,
+      x: (Math.random() - 0.5) * 240,
+      r: Math.random() * 720 - 360,
+      dark: i % 3 === 0,
+    })),
+  );
+  return (
+    <div className="confetti" aria-hidden="true">
+      {pieces.map((p, i) => (
+        <i
+          key={i}
+          className={p.dark ? 'dark' : ''}
+          style={{ left: `${p.left}%`, animationDelay: `${p.delay}s`, '--x': `${p.x}px`, '--r': `${p.r}deg` } as React.CSSProperties}
+        />
+      ))}
+    </div>
+  );
+}
 
 type State = { status: 'idle' | 'sending' | 'sent' | 'error'; error?: string };
 
@@ -30,6 +55,7 @@ export default function ContactForm() {
   if (state.status === 'sent') {
     return (
       <div className="contact-form sent" role="status">
+        {!reducedMotion() && <Confetti />}
         <p className="label">Message envoyé</p>
         <h3>Merci, je reviens vers vous sous 48 h.</h3>
         <button className="btn-link" onClick={() => setState({ status: 'idle' })}>Envoyer un autre message</button>

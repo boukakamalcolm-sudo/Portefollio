@@ -157,40 +157,19 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
   );
 }
 
-export default function AdminPanel({ projects, setProjects }: { projects: Project[]; setProjects: (p: Project[]) => void }) {
-  const [open, setOpen] = useState(false);
+export default function AdminDashboard({ initialProjects, blobReady }: { initialProjects: Project[]; blobReady: boolean }) {
+  const [projects, setProjects] = useState(initialProjects);
   const [editing, setEditing] = useState<Project | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const uploads = useRef<string[]>([]);
-  const gearRef = useRef<HTMLButtonElement>(null);
-  const drawerRef = useRef<HTMLElement>(null);
 
   function stopEditing() {
     discardUploads(uploads.current);
     uploads.current = [];
     setEditing(null);
   }
-
-  function closeDrawer() {
-    if (editing && !confirm('Fermer sans enregistrer ?')) return;
-    stopEditing();
-    setOpen(false);
-  }
-
-  const closeRef = useRef(closeDrawer);
-  closeRef.current = closeDrawer;
-
-  useEffect(() => {
-    if (!open) return;
-    const gear = gearRef.current;
-    drawerRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeRef.current();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => { window.removeEventListener('keydown', onKey); gear?.focus(); };
-  }, [open]);
 
   // fichiers envoyés puis onglet fermé sans enregistrer
   useEffect(() => {
@@ -199,11 +178,18 @@ export default function AdminPanel({ projects, setProjects }: { projects: Projec
     return () => window.removeEventListener('pagehide', onHide);
   }, []);
 
-  async function run(fn: () => Promise<Project[]>) {
+  useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(() => setNotice(''), 3000);
+    return () => clearTimeout(t);
+  }, [notice]);
+
+  async function run(fn: () => Promise<Project[]>, done: string) {
     setBusy(true);
     setError('');
     try {
       setProjects(await fn());
+      setNotice(done);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -213,7 +199,7 @@ export default function AdminPanel({ projects, setProjects }: { projects: Projec
 
   function remove(p: Project) {
     if (!confirm(`Supprimer « ${p.title} » et ses fichiers ? C’est définitif.`)) return;
-    run(() => api('DELETE', { id: p.id }));
+    run(() => api('DELETE', { id: p.id }), 'Projet supprimé');
   }
 
   function move(i: number, dir: -1 | 1) {
@@ -221,7 +207,7 @@ export default function AdminPanel({ projects, setProjects }: { projects: Projec
     if (j < 0 || j >= projects.length) return;
     const order = projects.map((p) => p.id);
     [order[i], order[j]] = [order[j], order[i]];
-    run(() => api('PATCH', { order }));
+    run(() => api('PATCH', { order }), 'Ordre enregistré');
   }
 
   async function logout() {
@@ -230,56 +216,73 @@ export default function AdminPanel({ projects, setProjects }: { projects: Projec
   }
 
   return (
-    <>
-      <button ref={gearRef} className="gear" onClick={() => setOpen(true)} aria-label="Gérer les projets" title="Gérer les projets">
-        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-          <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.62.06-.94s-.02-.63-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.92 2h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.72 8.47a.48.48 0 0 0 .12.61l2.03 1.58c-.05.31-.07.63-.07.94s.02.63.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z" />
-        </svg>
-      </button>
-
-      {open && (
-        <div className="drawer-backdrop" onMouseDown={(e) => e.target === e.currentTarget && !editing && setOpen(false)}>
-          <aside ref={drawerRef} tabIndex={-1} className="drawer" role="dialog" aria-modal="true" aria-label="Gestion des projets">
-            <div className="drawer-head">
-              <strong>PROJETS</strong>
-              <div>
-                <button className="link" onClick={logout}>Déconnexion</button>
-                <button className="drawer-close" onClick={closeDrawer} aria-label="Fermer">×</button>
-              </div>
-            </div>
-
-            {editing ? (
-              <Editor
-                initial={editing}
-                uploads={uploads}
-                onCancel={stopEditing}
-                onSaved={(p) => { setProjects(p); setEditing(null); }}
-              />
-            ) : (
-              <>
-                <button className="btn wide" onClick={() => setEditing(empty())}>+ Ajouter un projet</button>
-                {error && <p className="form-error" role="alert">{error}</p>}
-                <ul className="admin-list">
-                  {projects.map((p, i) => (
-                    <li key={p.id}>
-                      <div>
-                        <strong>{p.title}</strong>
-                        <small>{p.files.length} fichier{p.files.length > 1 ? 's' : ''}</small>
-                      </div>
-                      <div className="row-actions">
-                        <button onClick={() => move(i, -1)} disabled={busy || i === 0} aria-label="Monter">↑</button>
-                        <button onClick={() => move(i, 1)} disabled={busy || i === projects.length - 1} aria-label="Descendre">↓</button>
-                        <button onClick={() => setEditing(p)} disabled={busy}>Modifier</button>
-                        <button className="danger" onClick={() => remove(p)} disabled={busy}>Supprimer</button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </aside>
+    <div className="admin">
+      <header className="admin-head">
+        <a href="/" className="brand">MB<span>.</span></a>
+        <span className="label">Espace admin</span>
+        <div className="admin-head-actions">
+          <a className="btn-link" href="/" target="_blank" rel="noopener noreferrer">Voir le site ↗</a>
+          <button className="btn-link" onClick={logout}>Déconnexion</button>
         </div>
-      )}
-    </>
+      </header>
+
+      <main className="admin-main">
+        {!blobReady && (
+          <p className="admin-warning" role="alert">
+            <strong>Stockage non branché :</strong> les projets affichés sont ceux par défaut et aucune modification ne
+            peut être enregistrée. Dans Vercel : projet &gt; Storage &gt; Create &gt; Blob, puis connectez-le au projet et
+            redéployez.
+          </p>
+        )}
+
+        {editing ? (
+          <section className="admin-card">
+            <Editor
+              initial={editing}
+              uploads={uploads}
+              onCancel={stopEditing}
+              onSaved={(p) => { setProjects(p); setEditing(null); setNotice('Projet enregistré'); }}
+            />
+          </section>
+        ) : (
+          <section className="admin-card">
+            <div className="admin-card-head">
+              <div>
+                <p className="label">Réalisations</p>
+                <h1>{projects.length} projet{projects.length > 1 ? 's' : ''}</h1>
+              </div>
+              <button className="btn" onClick={() => setEditing(empty())} disabled={busy}>+ Ajouter un projet</button>
+            </div>
+            {error && <p className="form-error" role="alert">{error}</p>}
+            <ul className="admin-list">
+              {projects.map((p, i) => {
+                const cover = p.files.find((f) => f.kind === 'image');
+                return (
+                  <li key={p.id}>
+                    {cover
+                      // eslint-disable-next-line @next/next/no-img-element
+                      ? <img src={cover.url} alt="" className="admin-thumb" />
+                      : <span className="admin-thumb empty">{String(i + 1).padStart(2, '0')}</span>}
+                    <div className="admin-item">
+                      <strong>{p.title}</strong>
+                      <small>{p.sector || 'Sans secteur'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}</small>
+                    </div>
+                    <div className="row-actions">
+                      <button onClick={() => move(i, -1)} disabled={busy || i === 0} aria-label={`Monter ${p.title}`}>↑</button>
+                      <button onClick={() => move(i, 1)} disabled={busy || i === projects.length - 1} aria-label={`Descendre ${p.title}`}>↓</button>
+                      <button onClick={() => setEditing(p)} disabled={busy}>Modifier</button>
+                      <button className="danger" onClick={() => remove(p)} disabled={busy}>Supprimer</button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            {!projects.length && <p className="form-info">Aucun projet. Ajoutez le premier.</p>}
+          </section>
+        )}
+      </main>
+
+      {notice && <p className="admin-toast" role="status">{notice}</p>}
+    </div>
   );
 }

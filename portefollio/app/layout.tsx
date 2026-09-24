@@ -24,6 +24,10 @@ export const viewport: Viewport = { themeColor: '#f4f2f1' };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
+      <head>
+        {/* active les animations seulement si le JavaScript tourne (sinon tout reste visible) */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
       <body>{children}</body>
     </html>
   );

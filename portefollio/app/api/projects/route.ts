@@ -27,6 +27,8 @@ function clean(input: Partial<Project>): Project {
 
 const deny = () => NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
 const bad = (error: string) => NextResponse.json({ error }, { status: 400 });
+const noStore = () =>
+  NextResponse.json({ error: 'Stockage non branché : connectez un Blob store au projet dans Vercel.' }, { status: 503 });
 
 // Liste à jour (sans cache), pour l'admin
 export async function GET() {
@@ -37,6 +39,7 @@ export async function GET() {
 // Créer ou mettre à jour un projet
 export async function PUT(req: Request) {
   if (!(await isAdmin())) return deny();
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return noStore();
   const project = clean(await readJson(req));
   if (!project.title) return bad('Titre obligatoire');
   const projects = [...(await getProjects())];
@@ -56,6 +59,7 @@ export async function PUT(req: Request) {
 // Supprimer un projet
 export async function DELETE(req: Request) {
   if (!(await isAdmin())) return deny();
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return noStore();
   const id = (await readJson(req))?.id;
   if (typeof id !== 'string' || !id) return bad('Projet introuvable');
   const projects = await getProjects();
@@ -69,6 +73,7 @@ export async function DELETE(req: Request) {
 // Réordonner
 export async function PATCH(req: Request) {
   if (!(await isAdmin())) return deny();
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return noStore();
   const order: unknown = (await readJson(req))?.order;
   const projects = await getProjects();
   // l'ordre doit contenir chaque projet exactement une fois

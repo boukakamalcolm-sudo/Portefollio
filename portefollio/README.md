@@ -3,8 +3,11 @@
 Site vitrine (Next.js) pour vendre des outils sur mesure aux PME.
 
 ## Admin
-- Aller sur `/admin`, saisir le mot de passe : la roue crantée apparaît en bas à droite.
+- Aller sur `/admin` et saisir le mot de passe : la page liste les projets.
 - Ajouter, modifier, réordonner, supprimer des projets. Images et PDF uploadés sur Vercel Blob.
+- Une fois connecté, une roue crantée sur le site ramène à `/admin`.
+- Nécessite un Blob store connecté au projet (Vercel > Storage > Create > Blob) : sans lui, la page l'indique
+  et rien ne peut être enregistré.
 - 5 essais ratés en 15 minutes bloquent temporairement la connexion depuis la même adresse IP.
 - La page publique est statique : elle se régénère automatiquement après chaque enregistrement.
 

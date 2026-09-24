@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import type { Project } from '@/lib/types';
 import { BOOKING_URL, CONTACT_EMAIL, LEGAL_NAME, LINKEDIN_URL } from '@/lib/config';
+import ContactForm from './ContactForm';
 
 // chargé seulement pour l'admin connecté
 const AdminPanel = dynamic(() => import('./AdminPanel'));
@@ -71,8 +72,6 @@ const FIGURES = [
   ['50', 'applications cartographiées dans 18 directions régionales'],
 ];
 
-const CONTACT_HREF = BOOKING_URL || `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Premier échange')}`;
-const CONTACT_TARGET = BOOKING_URL ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -400,7 +399,7 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
             WhatsApp par un outil simple, que votre équipe utilise vraiment.
           </p>
           <div className="hero-actions">
-            <a className="btn-primary" href={CONTACT_HREF} {...CONTACT_TARGET}>
+            <a className="btn-primary" href="#contact">
               Parlons de votre projet →
             </a>
             <a className="btn-link" href="#work">Voir des exemples ↘</a>
@@ -525,14 +524,15 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
           <h2>On en parle ?</h2>
         </header>
         <div className="contact-grid">
-          <p>30 minutes pour comprendre votre activité et voir si je peux vous aider. Sans engagement.</p>
-          <div className="contact-links">
-            <a className="btn-primary" href={CONTACT_HREF} {...CONTACT_TARGET}>
-              {BOOKING_URL ? 'Réserver 30 minutes →' : 'Parlons de votre projet →'}
-            </a>
-            <a className="contact-email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-            {LINKEDIN_URL && <a className="btn-link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>}
+          <div className="contact-side">
+            <p>30 minutes pour comprendre votre activité et voir si je peux vous aider. Sans engagement.</p>
+            <div className="contact-links">
+              {BOOKING_URL && <a className="btn-link" href={BOOKING_URL} target="_blank" rel="noopener noreferrer">Réserver un créneau ↗</a>}
+              <a className="contact-email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+              {LINKEDIN_URL && <a className="btn-link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>}
+            </div>
           </div>
+          <ContactForm />
         </div>
       </section>
 

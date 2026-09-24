@@ -13,6 +13,9 @@ Site vitrine (Next.js) pour vendre des outils sur mesure aux PME.
 - `SESSION_SECRET` : chaîne aléatoire d'au moins 32 caractères (`openssl rand -hex 32`).
   La changer déconnecte toutes les sessions admin (utile en cas de doute).
 - `BLOB_READ_WRITE_TOKEN` : ajouté automatiquement par le Blob store
+- `RESEND_API_KEY` : clé Resend « envoi uniquement », pour le formulaire de contact.
+  Sans domaine vérifié, les messages partent de onboarding@resend.dev vers l'adresse du compte Resend.
+- `CONTACT_FROM` (facultatif) : expéditeur une fois un domaine vérifié sur Resend
 - `NEXT_PUBLIC_SITE_URL` : URL publique du site, sans slash final (sert au SEO et aux aperçus de partage)
 
 Sur Vercel, le « Root Directory » du projet doit être `portefollio`.

@@ -9,7 +9,7 @@ export const SITE_URL = (
 ).replace(/\/$/, '');
 
 // Laisser vide pour masquer le lien.
-export const LINKEDIN_URL = '';
+export const LINKEDIN_URL = 'https://www.linkedin.com/in/malcolm-b-401a35178/';
 // Lien de prise de rendez-vous (Calendly, Cal.com…). Vide : seul le mail est proposé.
 export const BOOKING_URL = '';
 

@@ -44,6 +44,33 @@ const STEPS = [
   ['Accompagner', 'Formation, ajustements, suivi dans la durée'],
 ];
 
+const XP = [
+  {
+    period: '2025 – 2026',
+    role: 'Chef de projet AMOA',
+    org: 'Ministère de la Culture',
+    text: 'Cartographie des outils de 18 directions régionales. Déploiement d’un outil de suivi d’indicateurs dans 89 musées, de la définition des données à la mise en service.',
+  },
+  {
+    period: '2024 – 2025',
+    role: 'Chef de projet transformation digitale',
+    org: 'Covéa',
+    text: 'Assistant interne qui répond aux questions RH et IT des salariés. Déploiement de Teams et SharePoint pour 550 personnes. Intégration de la gestion documentaire dans Salesforce.',
+  },
+  {
+    period: '2022 – 2024',
+    role: 'Proxy Product Owner',
+    org: 'Beekast · éditeur de logiciel',
+    text: 'Faire remonter les irritants des clients et les traduire en évolutions du produit, du besoin jusqu’au déploiement.',
+  },
+];
+
+const FIGURES = [
+  ['89', 'musées équipés d’un nouvel outil, utilisé à 100 %'],
+  ['550', 'utilisateurs accompagnés sur Teams et SharePoint'],
+  ['50', 'applications cartographiées dans 18 directions régionales'],
+];
+
 const CONTACT_HREF = BOOKING_URL || `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Premier échange')}`;
 const CONTACT_TARGET = BOOKING_URL ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
@@ -354,7 +381,7 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
       <nav className="nav">
         <a className="brand" href="#top" aria-label="Malcolm Boukaka, retour en haut">MB<span>.</span></a>
         <div className={`nav-links${menu ? ' open' : ''}`} id="menu" onClick={() => setMenu(false)}>
-          <a href="#offre">Offre</a><a href="#work">Réalisations</a><a href="#methode">Méthode</a><a href="#contact">Contact</a>
+          <a href="#offre">Offre</a><a href="#work">Réalisations</a><a href="#methode">Méthode</a><a href="#apropos">À propos</a><a href="#contact">Contact</a>
         </div>
         <div className="nav-end">
           <a className="nav-cta" href="#contact">Parlons-en →</a>
@@ -379,14 +406,20 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
             <a className="btn-link" href="#work">Voir des exemples ↘</a>
           </div>
         </div>
-        <div className="hero-card">
-          <div className="hero-photo">
-            <Image src="/malcolm.jpg" alt="Malcolm Boukaka" width={552} height={552} priority sizes="(max-width: 900px) 60vw, 340px" />
+        <div className="hero-card" aria-hidden="true">
+          <div className="dash">
+            <div className="dash-top"><span /><span /><span /><em>Tableau de bord · exemple</em></div>
+            <div className="dash-grid">
+              <div><small>Commandes du jour</small><strong>12</strong><i>+3 depuis hier</i></div>
+              <div><small>Devis à relancer</small><strong>3</strong><i>dont 1 urgent</i></div>
+              <div><small>Planning équipe</small><strong>5 / 5</strong><i>tout le monde est placé</i></div>
+              <div><small>Chiffre du mois</small><strong>8 450 €</strong><i>▲ 12 %</i></div>
+            </div>
+            <div className="dash-chart"><span /><span /><span /><span /><span /><span /><span /></div>
           </div>
-          <p className="hero-flow" aria-label="Du papier à Excel, puis à un outil sur mesure">
-            <span>Papier</span><b aria-hidden="true">→</b><span>Excel</span><b aria-hidden="true">→</b><span>Outil</span>
+          <p className="hero-flow">
+            <span>Papier</span><b>→</b><span>Excel</span><b>→</b><span>Outil</span>
           </p>
-          <p className="hero-name"><strong>Malcolm Boukaka</strong><br />Je simplifie le quotidien des PME</p>
         </div>
       </section>
 
@@ -446,9 +479,49 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
         </div>
       </section>
 
+      <section className="about block" id="apropos">
+        <header className="block-head">
+          <p className="label">05 — Qui suis-je</p>
+          <h2>Malcolm Boukaka.</h2>
+        </header>
+        <div className="about-grid">
+          <div className="about-photo">
+            <Image src="/malcolm.jpg" alt="Portrait de Malcolm Boukaka" width={552} height={552} sizes="(max-width: 900px) 90vw, 30vw" />
+          </div>
+          <div className="about-body">
+            <p className="about-intro">
+              Chef de projet en transformation digitale, je fais le lien entre les équipes du terrain et la technique :
+              comprendre comment vous travaillez, construire ou choisir le bon outil, et m’assurer qu’il est vraiment
+              utilisé. Je l’ai fait pour un ministère, un grand groupe d’assurance et un éditeur de logiciel.
+              Aujourd’hui, je mets cette méthode au service des PME.
+            </p>
+            <div className="figures">
+              {FIGURES.map(([n, t]) => <div key={n}><strong>{n}</strong><span>{t}</span></div>)}
+            </div>
+            <ol className="xp">
+              {XP.map((x) => (
+                <li key={x.org}>
+                  <span className="label">{x.period}</span>
+                  <div>
+                    <h3>{x.role} <small>· {x.org}</small></h3>
+                    <p>{x.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <p className="about-edu">
+              <span className="label">Formation</span>
+              Master Conseil et management des systèmes d’information, Institut Mines-Télécom (2026) · Bachelor INSEEC
+              Business School · DUT Techniques de commercialisation
+            </p>
+            {LINKEDIN_URL && <a className="btn-link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">Voir mon profil LinkedIn ↗</a>}
+          </div>
+        </div>
+      </section>
+
       <section className="contact block yellow" id="contact">
         <header className="block-head">
-          <p className="label">05 — Premier échange offert</p>
+          <p className="label">06 — Premier échange offert</p>
           <h2>On en parle ?</h2>
         </header>
         <div className="contact-grid">

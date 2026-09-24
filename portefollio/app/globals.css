@@ -113,7 +113,7 @@ footer{background:var(--dark);color:#d8d6d2;display:flex;justify-content:space-b
 footer a:hover{color:var(--yellow)}
 
 /* FENÊTRE PROJET */
-.modal-backdrop{position:fixed;inset:0;background:rgba(22,23,29,.7);z-index:100;overflow:auto;padding:3vw}
+.modal-backdrop{position:fixed;inset:0;background:rgba(22,23,29,.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:100;overflow:auto;padding:3vw}
 .modal{background:var(--bg);color:var(--text);max-width:1200px;margin:0 auto;position:relative;min-height:100%;animation:rise .45s cubic-bezier(.2,.8,.2,1)}
 @keyframes rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
 .modal-close{position:fixed;right:3vw;top:2vw;color:var(--white);font-size:40px;line-height:1;z-index:2;width:48px;height:48px}
@@ -138,14 +138,14 @@ footer a:hover{color:var(--yellow)}
 .case-result h3{font-size:clamp(34px,4vw,56px);margin:10px 0}
 .case-result p{max-width:720px;font-size:18px;line-height:1.5;white-space:pre-line;color:var(--ink)}
 .result-cta{display:inline-block;margin-top:14px;background:var(--dark);color:var(--yellow);padding:13px 20px;font-weight:500}
-.lightbox{position:fixed;inset:0;z-index:120;background:rgba(14,14,18,.94);display:flex;align-items:center;justify-content:center;padding:3vw;cursor:zoom-out}
+.lightbox{position:fixed;inset:0;z-index:120;background:rgba(14,14,18,.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:3vw;cursor:zoom-out}
 .lightbox img{max-width:100%;max-height:100%;object-fit:contain}
 .lightbox-close{position:fixed;right:3vw;top:2vw;color:var(--white);font-size:40px;line-height:1;width:48px;height:48px}
 
 /* ADMIN */
 .gear{position:fixed;right:22px;bottom:22px;z-index:90;width:54px;height:54px;border-radius:50%;background:var(--dark);color:var(--yellow);display:grid;place-items:center;box-shadow:0 6px 24px rgba(0,0,0,.25);transition:transform .4s}
 .gear:hover{transform:rotate(60deg)}
-.drawer-backdrop{position:fixed;inset:0;z-index:110;background:rgba(22,23,29,.55)}
+.drawer-backdrop{position:fixed;inset:0;z-index:110;background:rgba(22,23,29,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .drawer{position:absolute;right:0;top:0;bottom:0;width:min(560px,100vw);background:var(--bg);color:var(--ink);overflow:auto;padding:24px;animation:slide .3s cubic-bezier(.2,.8,.2,1)}
 @keyframes slide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
 .drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;font-family:var(--mono);font-size:13px;letter-spacing:.06em}

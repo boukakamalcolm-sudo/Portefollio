@@ -7,17 +7,24 @@ import { seedProjects } from './seed';
 const PREFIX = 'data/projects-';
 const TAG = 'projects';
 
-async function readLatest(): Promise<Project[]> {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return seedProjects;
+// null : rien d'enregistré depuis l'admin
+async function readLatest(): Promise<Project[] | null> {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
   const { blobs } = await list({ prefix: PREFIX });
-  if (!blobs.length) return seedProjects;
+  if (!blobs.length) return null;
   const latest = blobs.sort((a, b) => +new Date(b.uploadedAt) - +new Date(a.uploadedAt))[0];
   const res = await fetch(latest.url, { cache: 'no-store' });
-  if (!res.ok) return seedProjects;
+  if (!res.ok) return null;
   return (await res.json()) as Project[];
 }
 
-export const getProjects = unstable_cache(readLatest, ['projects'], { tags: [TAG] });
+const readCached = unstable_cache(readLatest, ['projects-v2'], { tags: [TAG] });
+
+// Le contenu de départ reste hors du cache : une modification de lib/seed.ts
+// est visible dès le déploiement suivant (le cache de données survit aux déploiements).
+export async function getProjects(): Promise<Project[]> {
+  return (await readCached()) ?? seedProjects;
+}
 
 export async function saveProjects(projects: Project[]) {
   const { blobs: old } = await list({ prefix: PREFIX });

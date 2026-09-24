@@ -10,7 +10,7 @@ export default function MentionsLegales() {
   return (
     <main className="legal">
       <a href="/" className="brand">MB<span>.</span></a>
-      <h1>MENTIONS<br />LÉGALES</h1>
+      <h1>Mentions légales</h1>
 
       <h2>ÉDITEUR DU SITE</h2>
       <p>{LEGAL_NAME}{LEGAL.status && ` · ${LEGAL.status}`}</p>
@@ -24,9 +24,12 @@ export default function MentionsLegales() {
 
       <h2>DONNÉES PERSONNELLES</h2>
       <p>
-        Ce site ne collecte aucune donnée personnelle en dehors des journaux techniques de l’hébergeur, n’utilise pas d’outil de mesure d’audience et ne dépose aucun
-        cookie publicitaire. Les messages envoyés par e-mail servent uniquement à répondre à votre demande et ne sont
-        pas transmis à des tiers. Vous pouvez demander leur suppression à tout moment à l’adresse ci-dessus.
+        Le formulaire de contact recueille votre nom, votre e-mail, le nom de votre entreprise et votre message. Ces
+        informations servent uniquement à répondre à votre demande : elles me sont transmises par e-mail via le
+        service Resend et ne sont ni revendues ni utilisées à des fins publicitaires. Elles sont conservées le temps
+        nécessaire au suivi de votre demande. Vous pouvez demander leur consultation ou leur suppression à tout
+        moment à l’adresse ci-dessus. Le site n’utilise pas d’outil de mesure d’audience et ne dépose aucun cookie
+        publicitaire.
       </p>
 
       <h2>PROPRIÉTÉ INTELLECTUELLE</h2>

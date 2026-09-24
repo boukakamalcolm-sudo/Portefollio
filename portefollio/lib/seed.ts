@@ -17,29 +17,30 @@ export const seedProjects: Project[] = [
     files: [],
   },
   {
-    id: 'deploiement-saas',
-    title: 'Déploiement SaaS',
-    subtitle: 'Faire adopter un nouvel outil par les équipes',
-    sector: 'Éditeur SaaS · Customer Success',
-    tags: ['DÉPLOIEMENT', 'FORMATION', 'ADOPTION'],
+    id: 'indicateurs-musees',
+    title: 'Indicateurs des musées',
+    subtitle: 'Un seul outil pour remonter les chiffres de 89 musées',
+    sector: 'Secteur public · Hauts-de-France',
+    tags: ['DÉPLOIEMENT', 'DONNÉES', 'ADOPTION'],
     problem:
-      'Un outil acheté mais peu utilisé : les équipes gardaient leurs anciennes habitudes et le logiciel ne tenait pas ses promesses.',
+      'Les musées d’une région transmettaient leurs indicateurs chacun à sa façon : fichiers différents, définitions différentes, relances permanentes pour obtenir les chiffres.',
     solution:
-      'Ateliers avec les métiers, paramétrage adapté aux usages réels, formation et supports simples, suivi de l’utilisation.',
-    result: 'Un déploiement structuré avec des indicateurs d’usage pour voir qui utilise l’outil et où ça bloque.',
+      'Définition commune des données à remonter, cadrage de l’outil, déploiement et accompagnement des équipes des musées jusqu’à la mise en service.',
+    result: '89 musées équipés et 100 % d’utilisation : les chiffres arrivent au même endroit, dans le même format.',
     files: [],
   },
   {
     id: 'cartographie-si',
     title: 'Cartographie des outils',
     subtitle: 'Y voir clair dans les logiciels d’une organisation',
-    sector: 'Secteur public · 18 entités',
+    sector: 'Secteur public · 18 directions régionales',
     tags: ['AUDIT', 'OUTILS', 'PILOTAGE'],
     problem:
       'Des dizaines d’outils utilisés sans vue d’ensemble, des doublons, des fichiers maison que personne ne maîtrise.',
     solution:
-      'Recensement des applications dans les 18 entités, repérage des outils « officieux », restitution claire pour décider quoi garder, remplacer ou supprimer.',
-    result: 'Une carte lisible des outils, qui sert de base aux décisions d’investissement.',
+      'Recensement des applications dans les 18 directions régionales, repérage des outils « officieux », restitution claire pour décider quoi garder, remplacer ou supprimer.',
+    result:
+      '50 applications recensées, dont 30 % d’outils « officieux ». Les scénarios de simplification ont été arbitrés en comité de direction.',
     files: [],
   },
 ];

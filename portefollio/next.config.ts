@@ -22,6 +22,17 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }],
   },
+  // ancienne adresse du site : redirection permanente vers la nouvelle
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'portefollio.vercel.app' }],
+        destination: 'https://mb-conseil.vercel.app/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

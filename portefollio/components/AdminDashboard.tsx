@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { upload } from '@vercel/blob/client';
 import type { Project, ProjectFile } from '@/lib/types';
 
 const empty = (): Project => ({
@@ -25,6 +24,42 @@ async function api(method: string, body: unknown) {
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json.error || 'Erreur');
   return json.projects as Project[];
+}
+
+const MAX_BYTES = 4.4 * 1024 * 1024;
+
+// Réduit les photos lourdes (2400 px max, WebP) pour tenir sous la limite d'envoi de 4 Mo
+async function compressImage(file: File): Promise<Blob> {
+  if (file.type === 'image/gif' || file.size < 600 * 1024) return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const out = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/webp', 0.85));
+    return out && out.size < file.size ? out : file;
+  } catch {
+    return file;
+  }
+}
+
+function sendFile(data: Blob, name: string, onProgress: (pct: number) => void): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `/api/upload?name=${encodeURIComponent(name)}`);
+    xhr.setRequestHeader('Content-Type', data.type);
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress((e.loaded / e.total) * 100);
+    xhr.onload = () => {
+      let json: { url?: string; error?: string } = {};
+      try { json = JSON.parse(xhr.responseText); } catch {}
+      if (xhr.status < 300 && json.url) resolve(json.url);
+      else reject(new Error(json.error || 'L’envoi a échoué'));
+    };
+    xhr.onerror = () => reject(new Error('Connexion interrompue'));
+    xhr.send(data);
+  });
 }
 
 // Supprime côté serveur les fichiers envoyés mais finalement pas enregistrés
@@ -66,14 +101,15 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
       }
       try {
         setUploading(`Envoi de ${file.name}…`);
-        const safe = file.name.replace(/[^\w.\-]+/g, '-');
-        const blob = await upload(`projets/${safe}`, file, {
-          access: 'public',
-          handleUploadUrl: '/api/upload',
-          onUploadProgress: ({ percentage }) => setUploading(`Envoi de ${file.name} : ${Math.round(percentage)} %`),
-        });
-        uploads.current.push(blob.url);
-        added.push({ url: blob.url, name: file.name, kind: isPdf ? 'pdf' : 'image' });
+        const data = isPdf ? file : await compressImage(file);
+        if (data.size > MAX_BYTES) {
+          throw new Error(isPdf
+            ? 'PDF trop lourd (4 Mo maximum). Compressez-le d’abord, par exemple sur ilovepdf.com.'
+            : 'image trop lourde, même après compression (4 Mo maximum)');
+        }
+        const url = await sendFile(data, file.name, (pct) => setUploading(`Envoi de ${file.name} : ${Math.round(pct)} %`));
+        uploads.current.push(url);
+        added.push({ url, name: file.name, kind: isPdf ? 'pdf' : 'image' });
       } catch (e) {
         setError(`${file.name} : ${(e as Error).message}`);
       }
@@ -123,7 +159,7 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
       <label>Le résultat<textarea rows={3} value={p.result} onChange={set('result')} /></label>
 
       <div className="files">
-        <span className="files-title">Fichiers (images et PDF). La 1re image sert de couverture.</span>
+        <span className="files-title">Fichiers (images et PDF, 4 Mo max ; les photos sont réduites automatiquement). La 1re image sert de couverture.</span>
         {p.files.map((f, i) => (
           <div className="file-row" key={f.url}>
             {f.kind === 'image'

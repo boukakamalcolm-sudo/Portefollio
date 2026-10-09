@@ -6,9 +6,9 @@ import '@fontsource/ibm-plex-mono/400.css';
 import './globals.css';
 import { SITE_NAME, SITE_URL } from '@/lib/config';
 
-const title = `${SITE_NAME} · Outils sur mesure pour PME`;
+const title = `${SITE_NAME} · Product Manager & Product Owner`;
 const description =
-  'Je simplifie le quotidien des PME : devis, commandes, plannings, suivi clients. Moins de papier, moins de ressaisie, vos process dématérialisés dans un outil simple que votre équipe utilise vraiment.';
+  'Portfolio de Malcolm Boukaka-Massengo : Product Management, Product Ownership, discovery, priorisation, delivery et transformation des organisations.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title, description },
 };
 
-export const viewport: Viewport = { themeColor: '#f4f2f1' };
+export const viewport: Viewport = { themeColor: '#f5f4ef' };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

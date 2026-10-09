@@ -66,9 +66,9 @@ const XP = [
 ];
 
 const FIGURES: [number, string][] = [
-  [89, 'musées équipés d’un nouvel outil, utilisé à 100 %'],
-  [550, 'utilisateurs accompagnés sur Teams et SharePoint'],
-  [50, 'applications cartographiées dans 18 directions régionales'],
+  [89, 'musées concernés par le déploiement d’un outil de suivi'],
+  [550, 'collaborateurs accompagnés sur Microsoft 365 et SharePoint'],
+  [50, 'applications recensées dans 18 directions régionales'],
 ];
 
 function PainCard({ pain, fix, index }: { pain: string; fix: string; index: number }) {

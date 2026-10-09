@@ -399,10 +399,10 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
       <nav className="nav">
         <a className="brand" href="#top" aria-label="Malcolm Boukaka, retour en haut">MB<span>.</span></a>
         <div className={`nav-links${menu ? ' open' : ''}`} id="menu" onClick={() => setMenu(false)}>
-          <a href="#offre">Approche</a><a href="#work">Projets</a><a href="#methode">Méthode</a><a href="#apropos">Parcours</a><a href="#contact">Contact</a>
+          <a href="#work">Projets</a><a href="#apropos">Parcours</a><a href="#contact">Contact</a>
         </div>
         <div className="nav-end">
-          <a className="nav-cta" href="#contact">Parlons-en →</a>
+          <a className="nav-cta" href="#contact">Contact ↗</a>
           <button className="nav-toggle" aria-expanded={menu} aria-controls="menu" onClick={() => setMenu(!menu)}>
             {menu ? 'Fermer' : 'Menu'}
           </button>
@@ -411,16 +411,12 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
 
       <section className="hero" id="top">
         <div className="hero-text">
-          <p className="label">PRODUCT MANAGEMENT · PRODUCT OWNERSHIP · TRANSFORMATION</p>
-          <h1 className="hero-title" data-reveal>Du problème<br />à la <mark>valeur produit.</mark></h1>
-          <p className="hero-sub">
-            Je fais le lien entre utilisateurs, métiers et équipes techniques pour transformer des besoins complexes en produits utiles, livrables et mesurables.
-          </p>
+          <p className="label">PRODUCT MANAGER · PRODUCT OWNER</p>
+          <h1 className="hero-title" data-reveal>Malcolm<br /><mark>Boukaka.</mark></h1>
+          <p className="hero-sub">Je conçois des solutions utiles à la croisée du métier, des utilisateurs et de la technologie.</p>
           <div className="hero-actions">
-            <a className="btn-primary" href="#work">
-              Découvrir mes projets →
-            </a>
-            <a className="btn-link" href="#apropos">Explorer mon parcours ↘</a>
+            <a className="btn-primary" href="#work">Voir les projets ↘</a>
+            {LINKEDIN_URL && <a className="btn-link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>}
           </div>
         </div>
         <div className="hero-card" aria-hidden="true">
@@ -431,78 +427,25 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
         </div>
       </section>
 
-      <section className="pains block yellow">
-        <header className="block-head">
-          <p className="label">01 — Ma conviction produit</p>
-          <h2 data-reveal>Partir du problème, <mark>pas de la solution.</mark></h2>
-          <p className="block-intro pain-hint">Les réflexes que j’applique pour construire des produits utiles.</p>
-        </header>
-        <div className="pain-grid">
-          <p className="pain-lead">
-            Une fonctionnalité n’a de valeur que si elle répond à un vrai besoin. Mon rôle : aligner la réalité du terrain, les objectifs métier et la capacité des équipes à livrer.
-          </p>
-          <ul className="pain-list">
-            {PAINS.map(([pain, fix], i) => <PainCard key={pain} pain={pain} fix={fix} index={i} />)}
-          </ul>
-        </div>
-      </section>
-
-      <section className="offer block" id="offre">
-        <header className="block-head">
-          <p className="label">02 — De l’idée à l’impact</p>
-          <h2>Une approche produit de bout en bout.</h2>
-        </header>
-        <div className="offer-grid">
-          {OFFERS.map((o) => (
-            <div className="offer-card" key={o.n}>
-              <span className="label">{o.n}</span>
-              <h3>{o.title}</h3>
-              <p>{o.text}</p>
-              <div className="tags">{o.tags.map((t) => <span key={t}>{t}</span>)}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section className="work block grey" id="work">
         <header className="block-head">
-          <p className="label">03 — Selected work</p>
-          <h2>Des problèmes réels, des décisions produit.</h2>
-          <p className="block-intro">Explorez les contextes, les choix, la livraison et les apprentissages de chaque projet.</p>
+          <p className="label">01 / Projets sélectionnés</p>
+          <h2>Selected work<span className="heading-period">.</span></h2>
         </header>
         <Carousel projects={projects} onOpen={setActive} />
       </section>
 
-      <section className="process block" id="methode">
-        <div className="process-grid">
-          <header className="block-head">
-            <p className="label">04 — Mon operating model</p>
-            <h2>Du discovery au delivery.</h2>
-          </header>
-          <ol className="process-list">
-            {STEPS.map(([t, d], i) => (
-              <li key={t}><span className="label">{i + 1}.</span><strong>{t}</strong><small>{d}</small></li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       <section className="about block" id="apropos">
         <header className="block-head">
-          <p className="label">05 — Expérience & parcours</p>
-          <h2>Malcolm Boukaka-Massengo.</h2>
+          <p className="label">02 / Parcours</p>
+          <h2>Expérience<span className="heading-period">.</span></h2>
         </header>
         <div className="about-grid">
           <div className="about-photo">
             <Image src="/malcolm.jpg" alt="Portrait de Malcolm Boukaka" width={552} height={552} sizes="(max-width: 900px) 90vw, 30vw" />
           </div>
           <div className="about-body">
-            <p className="about-intro">
-              Product Manager / Product Owner orienté métier, je fais le lien entre les besoins utilisateurs, les objectifs de l’organisation et les équipes de réalisation. Mon expérience couvre le SaaS, la transformation des usages et les systèmes d’information, avec un fil conducteur : clarifier les problèmes, aligner les parties prenantes et accompagner les solutions jusqu’à leur adoption.
-            </p>
-            <div className="figures">
-              {FIGURES.map(([n, t]) => <div key={n}><strong><CountUp value={n} /></strong><span>{t}</span></div>)}
-            </div>
+            <p className="about-intro">Du SaaS aux systèmes d’information, j’interviens à l’interface entre utilisateurs, équipes métier et équipes techniques — du cadrage à l’adoption.</p>
             <ol className="xp">
               {XP.map((x) => (
                 <li key={x.org}>
@@ -526,26 +469,26 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
 
       <section className="contact block yellow" id="contact">
         <header className="block-head">
-          <p className="label">06 — Contact</p>
-          <h2>Construisons la suite.</h2>
+          <p className="label">03 / Contact</p>
+          <h2>On se parle<span className="heading-period"> ?</span></h2>
         </header>
         <div className="contact-grid">
           <div className="contact-side">
-            <p>Vous recrutez un Product Manager ou un Product Owner capable de dialoguer avec les métiers et la technique ? Échangeons sur vos enjeux produit, vos utilisateurs et vos priorités.</p>
+            <p>Ouvert aux opportunités Product Manager et Product Owner.</p>
             <div className="contact-links">
               {BOOKING_URL && <a className="btn-link" href={BOOKING_URL} target="_blank" rel="noopener noreferrer">Réserver un créneau ↗</a>}
               <a className="contact-email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
               {LINKEDIN_URL && <a className="btn-link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>}
             </div>
           </div>
-          <ContactForm />
+
         </div>
       </section>
 
       <footer>
         <span>© {new Date().getFullYear()} {LEGAL_NAME}</span>
-        <a href="/mentions-legales">Mentions légales</a>
-        <a href="#top">Haut de page ↑</a>
+        <span>Product · Delivery · Impact</span>
+        <a href="#top">Retour en haut ↑</a>
       </footer>
 
       {activeProject && <CaseModal project={activeProject} index={active!} onClose={close} />}

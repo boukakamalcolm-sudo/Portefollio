@@ -10,58 +10,58 @@ import { CountUp } from './motion';
 
 
 const PAINS = [
-  ['La même information est saisie trois fois, à trois endroits différents.', 'Une seule saisie, visible par tous, partout.'],
-  ['Pour savoir où en est une commande ou un dossier, il faut appeler quelqu’un.', 'Chacun voit l’avancement en temps réel, sans décrocher son téléphone.'],
-  ['Tout repose sur un fichier Excel que seule une personne comprend vraiment.', 'Un outil clair que toute l’équipe sait utiliser, même en son absence.'],
-  ['Vous ne savez pas ce que vous avez réellement gagné ce mois-ci.', 'Vos ventes, vos dépenses et votre marge à jour, en un coup d’œil.'],
+  ['Les équipes n’ont pas la même compréhension du problème utilisateur.', 'Discovery : confronter les besoins terrain aux objectifs métier.'],
+  ['Les demandes s’accumulent sans critères clairs de priorité.', 'Prioriser selon la valeur, l’effort, les risques et la stratégie.'],
+  ['Les équipes livrent une fonctionnalité sans savoir si elle aide vraiment.', 'Définir des critères de succès et apprendre après la mise en production.'],
+  ['Un outil existe, mais les usages et l’adoption restent difficiles à mesurer.', 'Accompagner le changement et suivre les signaux d’adoption.'],
 ];
 
 const OFFERS = [
   {
     n: '01',
-    title: 'Diagnostic',
-    text: 'On regarde ensemble comment vous travaillez aujourd’hui et où part le temps. Vous repartez avec un plan clair, même si on ne va pas plus loin.',
-    tags: ['1 À 2 JOURS', 'PLAN D’ACTION'],
+    title: 'Discovery & cadrage',
+    text: 'Comprendre les utilisateurs, observer les parcours, clarifier le problème et aligner les parties prenantes sur un objectif produit.',
+    tags: ['RECHERCHE UTILISATEUR', 'PROBLEM STATEMENT'],
   },
   {
     n: '02',
-    title: 'Outil sur mesure',
-    text: 'Une application web simple, pensée pour votre activité : devis, commandes, planning, suivi clients, tableaux de bord. Utilisable sur téléphone.',
-    tags: ['DEVIS', 'PLANNING', 'SUIVI', 'TABLEAUX DE BORD'],
+    title: 'Stratégie & delivery',
+    text: 'Transformer les besoins en backlog lisible, prioriser les évolutions, rédiger les user stories et coordonner métier, design et technique jusqu’à la livraison.',
+    tags: ['ROADMAP', 'BACKLOG', 'USER STORIES'],
   },
   {
     n: '03',
-    title: 'Mise en route',
-    text: 'Formation de l’équipe, ajustements après les premières semaines, suivi. Un outil ne sert à rien si personne ne l’utilise.',
-    tags: ['FORMATION', 'ADOPTION', 'SUIVI'],
+    title: 'Adoption & impact',
+    text: 'Définir les indicateurs utiles, préparer le déploiement, accompagner les utilisateurs et vérifier ce qui change réellement après la mise en service.',
+    tags: ['KPI', 'CHANGE', 'AMÉLIORATION CONTINUE'],
   },
 ];
 
 const STEPS = [
-  ['Écouter', 'Votre métier, vos contraintes, ce qui vous fait perdre du temps'],
-  ['Cartographier', 'Qui fait quoi, avec quels outils, où ça coince'],
-  ['Construire', 'Un outil simple, testé avec vous au fur et à mesure'],
-  ['Accompagner', 'Formation, ajustements, suivi dans la durée'],
+  ['Découvrir', 'Écouter les utilisateurs, analyser les irritants et les données disponibles'],
+  ['Cadrer', 'Formuler le problème, la cible, la valeur attendue et les critères de succès'],
+  ['Prioriser & livrer', 'Arbitrer le backlog, clarifier les user stories et travailler avec les équipes'],
+  ['Mesurer & apprendre', 'Suivre les usages, recueillir le feedback et ajuster la feuille de route'],
 ];
 
 const XP = [
   {
     period: '2025 – 2026',
-    role: 'Chef de projet AMOA',
+    role: 'Conseiller SI · pilotage & stratégie',
     org: 'Ministère de la Culture',
-    text: 'Cartographie des outils de 18 directions régionales. Déploiement d’un outil de suivi d’indicateurs dans 89 musées, de la définition des données à la mise en service.',
+    text: 'Cartographie du système d’information et des outils de 18 directions régionales. Contribution au cadrage et au déploiement d’un outil de suivi d’indicateurs dans le réseau des musées, de la définition des données à la mise en service.',
   },
   {
     period: '2024 – 2025',
-    role: 'Chef de projet transformation digitale',
-    org: 'Covéa',
-    text: 'Assistant interne qui répond aux questions RH et IT des salariés. Déploiement de Teams et SharePoint pour 550 personnes. Intégration de la gestion documentaire dans Salesforce.',
+    role: 'Chef de projet AMOA / transformation',
+    org: 'Covéa Protection Juridique',
+    text: 'Contribution à des projets de transformation des usages : environnement Microsoft 365, Teams et SharePoint, digital workplace et gestion documentaire. Interface entre besoins métiers, utilisateurs et solutions SI.',
   },
   {
     period: '2022 – 2024',
-    role: 'Proxy Product Owner',
-    org: 'Beekast · éditeur de logiciel',
-    text: 'Faire remonter les irritants des clients et les traduire en évolutions du produit, du besoin jusqu’au déploiement.',
+    role: 'Customer Success Manager',
+    org: 'Beekast · éditeur SaaS',
+    text: 'Déploiement de la solution, cadrage des besoins clients, animation d’ateliers et de formations, analyse des usages et coordination avec les équipes produit, marketing et SI. Une expérience au contact direct des utilisateurs et de leurs retours produit.',
   },
 ];
 
@@ -399,7 +399,7 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
       <nav className="nav">
         <a className="brand" href="#top" aria-label="Malcolm Boukaka, retour en haut">MB<span>.</span></a>
         <div className={`nav-links${menu ? ' open' : ''}`} id="menu" onClick={() => setMenu(false)}>
-          <a href="#offre">Offre</a><a href="#work">Réalisations</a><a href="#methode">Méthode</a><a href="#apropos">À propos</a><a href="#contact">Contact</a>
+          <a href="#offre">Approche</a><a href="#work">Projets</a><a href="#methode">Méthode</a><a href="#apropos">Parcours</a><a href="#contact">Contact</a>
         </div>
         <div className="nav-end">
           <a className="nav-cta" href="#contact">Parlons-en →</a>
@@ -411,37 +411,35 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
 
       <section className="hero" id="top">
         <div className="hero-text">
-          <p className="label">Outils sur mesure pour PME · Paris / à distance</p>
-          <h1 className="hero-title" data-reveal>Moins d’Excel.<br />Plus de <mark>temps.</mark></h1>
+          <p className="label">PRODUCT MANAGEMENT · PRODUCT OWNERSHIP · TRANSFORMATION</p>
+          <h1 className="hero-title" data-reveal>Du problème<br />à la <mark>valeur produit.</mark></h1>
           <p className="hero-sub">
-            Devis, commandes, plannings, suivi clients : je remplace vos fichiers Excel, vos papiers et vos groupes
-            WhatsApp par un outil simple, que votre équipe utilise vraiment.
+            Je fais le lien entre utilisateurs, métiers et équipes techniques pour transformer des besoins complexes en produits utiles, livrables et mesurables.
           </p>
           <div className="hero-actions">
-            <a className="btn-primary" href="#contact">
-              Parlons de votre projet →
+            <a className="btn-primary" href="#work">
+              Découvrir mes projets →
             </a>
-            <a className="btn-link" href="#work">Voir des exemples ↘</a>
+            <a className="btn-link" href="#apropos">Explorer mon parcours ↘</a>
           </div>
         </div>
         <div className="hero-card" aria-hidden="true">
           <HeroDash />
           <p className="hero-flow">
-            <span>Papier</span><b>→</b><span>Excel</span><b>→</b><span>Outil</span>
+            <span>Discovery</span><b>→</b><span>Delivery</span><b>→</b><span>Impact</span>
           </p>
         </div>
       </section>
 
       <section className="pains block yellow">
         <header className="block-head">
-          <p className="label">01 — Ça vous parle ?</p>
-          <h2 data-reveal>Votre activité tourne <mark>à la main.</mark></h2>
-          <p className="block-intro pain-hint">Survolez ou touchez une case pour voir ce qui change avec un bon outil.</p>
+          <p className="label">01 — Ma conviction produit</p>
+          <h2 data-reveal>Partir du problème, <mark>pas de la solution.</mark></h2>
+          <p className="block-intro pain-hint">Les réflexes que j’applique pour construire des produits utiles.</p>
         </header>
         <div className="pain-grid">
           <p className="pain-lead">
-            Ce n’est pas un problème de logiciel. C’est un problème d’organisation que personne n’a pris le temps de
-            poser à plat. C’est là que j’interviens.
+            Une fonctionnalité n’a de valeur que si elle répond à un vrai besoin. Mon rôle : aligner la réalité du terrain, les objectifs métier et la capacité des équipes à livrer.
           </p>
           <ul className="pain-list">
             {PAINS.map(([pain, fix], i) => <PainCard key={pain} pain={pain} fix={fix} index={i} />)}
@@ -451,8 +449,8 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
 
       <section className="offer block" id="offre">
         <header className="block-head">
-          <p className="label">02 — Ce que je fais</p>
-          <h2>Du bricolage à l’outil.</h2>
+          <p className="label">02 — De l’idée à l’impact</p>
+          <h2>Une approche produit de bout en bout.</h2>
         </header>
         <div className="offer-grid">
           {OFFERS.map((o) => (
@@ -468,9 +466,9 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
 
       <section className="work block grey" id="work">
         <header className="block-head">
-          <p className="label">03 — Réalisations</p>
-          <h2>Des cas concrets.</h2>
-          <p className="block-intro">Faites défiler, cliquez pour ouvrir.</p>
+          <p className="label">03 — Selected work</p>
+          <h2>Des problèmes réels, des décisions produit.</h2>
+          <p className="block-intro">Explorez les contextes, les choix, la livraison et les apprentissages de chaque projet.</p>
         </header>
         <Carousel projects={projects} onOpen={setActive} />
       </section>
@@ -478,8 +476,8 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
       <section className="process block" id="methode">
         <div className="process-grid">
           <header className="block-head">
-            <p className="label">04 — Ma méthode</p>
-            <h2>Simple, et ça tient.</h2>
+            <p className="label">04 — Mon operating model</p>
+            <h2>Du discovery au delivery.</h2>
           </header>
           <ol className="process-list">
             {STEPS.map(([t, d], i) => (
@@ -491,8 +489,8 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
 
       <section className="about block" id="apropos">
         <header className="block-head">
-          <p className="label">05 — Qui suis-je</p>
-          <h2>Malcolm Boukaka.</h2>
+          <p className="label">05 — Expérience & parcours</p>
+          <h2>Malcolm Boukaka-Massengo.</h2>
         </header>
         <div className="about-grid">
           <div className="about-photo">
@@ -500,10 +498,7 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
           </div>
           <div className="about-body">
             <p className="about-intro">
-              Chef de projet en transformation digitale, je fais le lien entre les équipes du terrain et la technique :
-              comprendre comment vous travaillez, construire ou choisir le bon outil, et m’assurer qu’il est vraiment
-              utilisé. Je l’ai fait pour un ministère, un grand groupe d’assurance et un éditeur de logiciel.
-              Aujourd’hui, je mets cette méthode au service des PME.
+              Product Manager / Product Owner orienté métier, je fais le lien entre les besoins utilisateurs, les objectifs de l’organisation et les équipes de réalisation. Mon expérience couvre le SaaS, la transformation des usages et les systèmes d’information, avec un fil conducteur : clarifier les problèmes, aligner les parties prenantes et accompagner les solutions jusqu’à leur adoption.
             </p>
             <div className="figures">
               {FIGURES.map(([n, t]) => <div key={n}><strong><CountUp value={n} /></strong><span>{t}</span></div>)}
@@ -531,12 +526,12 @@ export default function Site({ initialProjects }: { initialProjects: Project[] }
 
       <section className="contact block yellow" id="contact">
         <header className="block-head">
-          <p className="label">06 — Premier échange offert</p>
-          <h2>On en parle ?</h2>
+          <p className="label">06 — Contact</p>
+          <h2>Construisons la suite.</h2>
         </header>
         <div className="contact-grid">
           <div className="contact-side">
-            <p>30 minutes pour comprendre votre activité et voir si je peux vous aider. Sans engagement.</p>
+            <p>Vous recrutez un Product Manager ou un Product Owner capable de dialoguer avec les métiers et la technique ? Échangeons sur vos enjeux produit, vos utilisateurs et vos priorités.</p>
             <div className="contact-links">
               {BOOKING_URL && <a className="btn-link" href={BOOKING_URL} target="_blank" rel="noopener noreferrer">Réserver un créneau ↗</a>}
               <a className="contact-email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>

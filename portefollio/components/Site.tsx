@@ -4,45 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import type { Project } from '@/lib/types';
 import { BOOKING_URL, CONTACT_EMAIL, LEGAL_NAME, LINKEDIN_URL } from '@/lib/config';
-import ContactForm from './ContactForm';
-import HeroDash from './HeroDash';
-import { CountUp } from './motion';
 
-
-const PAINS = [
-  ['Les équipes n’ont pas la même compréhension du problème utilisateur.', 'Discovery : confronter les besoins terrain aux objectifs métier.'],
-  ['Les demandes s’accumulent sans critères clairs de priorité.', 'Prioriser selon la valeur, l’effort, les risques et la stratégie.'],
-  ['Les équipes livrent une fonctionnalité sans savoir si elle aide vraiment.', 'Définir des critères de succès et apprendre après la mise en production.'],
-  ['Un outil existe, mais les usages et l’adoption restent difficiles à mesurer.', 'Accompagner le changement et suivre les signaux d’adoption.'],
-];
-
-const OFFERS = [
-  {
-    n: '01',
-    title: 'Discovery & cadrage',
-    text: 'Comprendre les utilisateurs, observer les parcours, clarifier le problème et aligner les parties prenantes sur un objectif produit.',
-    tags: ['RECHERCHE UTILISATEUR', 'PROBLEM STATEMENT'],
-  },
-  {
-    n: '02',
-    title: 'Stratégie & delivery',
-    text: 'Transformer les besoins en backlog lisible, prioriser les évolutions, rédiger les user stories et coordonner métier, design et technique jusqu’à la livraison.',
-    tags: ['ROADMAP', 'BACKLOG', 'USER STORIES'],
-  },
-  {
-    n: '03',
-    title: 'Adoption & impact',
-    text: 'Définir les indicateurs utiles, préparer le déploiement, accompagner les utilisateurs et vérifier ce qui change réellement après la mise en service.',
-    tags: ['KPI', 'CHANGE', 'AMÉLIORATION CONTINUE'],
-  },
-];
-
-const STEPS = [
-  ['Découvrir', 'Écouter les utilisateurs, analyser les irritants et les données disponibles'],
-  ['Cadrer', 'Formuler le problème, la cible, la valeur attendue et les critères de succès'],
-  ['Prioriser & livrer', 'Arbitrer le backlog, clarifier les user stories et travailler avec les équipes'],
-  ['Mesurer & apprendre', 'Suivre les usages, recueillir le feedback et ajuster la feuille de route'],
-];
 
 const XP = [
   {
@@ -64,28 +26,6 @@ const XP = [
     text: 'Déploiement de la solution, cadrage des besoins clients, animation d’ateliers et de formations, analyse des usages et coordination avec les équipes produit, marketing et SI. Une expérience au contact direct des utilisateurs et de leurs retours produit.',
   },
 ];
-
-const FIGURES: [number, string][] = [
-  [89, 'musées concernés par le déploiement d’un outil de suivi'],
-  [550, 'collaborateurs accompagnés sur Microsoft 365 et SharePoint'],
-  [50, 'applications recensées dans 18 directions régionales'],
-];
-
-function PainCard({ pain, fix, index }: { pain: string; fix: string; index: number }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <li>
-      <button className={`pain-card${open ? ' open' : ''}`} aria-pressed={open} onClick={() => setOpen(!open)}>
-        <span className="label">{pad(index + 1)}</span>
-        <span className="pain-text">{pain}</span>
-        <span className="pain-fix"><b aria-hidden="true">✓</b> {fix}</span>
-      </button>
-    </li>
-  );
-}
-
-
-const pad = (n: number) => String(n).padStart(2, '0');
 
 function Cover({ project, index }: { project: Project; index: number }) {
   const img = project.files.find((f) => f.kind === 'image');

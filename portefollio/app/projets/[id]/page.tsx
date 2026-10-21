@@ -53,7 +53,6 @@ export default async function ProjectPage({ params }: Props) {
   const steps = lines(p.solution);
   const media = projectMedia(p);
   const bg = visualStyle(media.color, index);
-  const logo = media.icon ?? (media.screens.length ? visualSrc(p) : undefined);
   const pdfs = p.files.filter((f) => f.kind === 'pdf');
   const facts = [
     ['Rôle', p.role],
@@ -64,40 +63,38 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <Shell active="Projets">
-      <p className="back"><a className="chip-link" href="/#projets">← Tous les projets</a></p>
+      <article className="sheet">
+        <p className="back"><a className="hotspot back-link" href="/#projets"><i aria-hidden="true" />Tous les projets</a></p>
 
-      <article className="panel sheet">
-        {/* sans écran, l'objet 3D est déjà en grand dans la bande : pas de doublon dans l'en-tête */}
-        <header className={`sheet-head${logo ? '' : ' no-logo'}`}>
-          {logo && <Image className={`sheet-logo${media.icon ? ' is-app' : ''}`} src={logo} alt="" width={160} height={160} priority />}
-          <div>
-            <p className="label">Projet {pad(index + 1)} / {pad(projects.length)} · {p.sector}</p>
-            <h1>{p.title}</h1>
-            {p.subtitle && <p className="sheet-sub">{p.subtitle}</p>}
-          </div>
+        {/* sans écran, l'objet 3D est déjà en grand dans la scène : pas de doublon dans l'en-tête */}
+        <header className="sheet-head">
+          {media.icon && <Image className="sheet-logo" src={media.icon} alt="" width={160} height={160} priority />}
+          <p className="label">Projet {pad(index + 1)} / {pad(projects.length)} · {p.sector}</p>
+          <h1 className="title">{p.title}{/[.!?]$/.test(p.title) ? '' : '.'}{p.subtitle && <span> {p.subtitle}</span>}</h1>
         </header>
-        {(facts.length > 0 || p.tags.length > 0) && (
-          <div className="sheet-meta">
-            {facts.length > 0 && <dl className="sheet-facts">{facts.map(([k, v]) => <div key={k}><dt className="label">{k}</dt><dd>{v}</dd></div>)}</dl>}
-            {p.tags.length > 0 && <ul className="bubbles">{p.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
-          </div>
-        )}
 
-        <section className={`sheet-band ${bg.className}`} style={bg.style}>
+        {facts.length > 0 && (
+          <dl className="sheet-facts">
+            {facts.map(([k, v]) => <div key={k}><dt className="label">{k}</dt><dd>{v}</dd></div>)}
+          </dl>
+        )}
+        {p.tags.length > 0 && <ul className="bubbles sheet-tags">{p.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
+
+        <section className={`stage ${bg.className}`} style={bg.style} aria-label={media.screens.length ? 'Écrans de l’application' : undefined}>
           {media.screens.length > 0
             ? <Gallery screens={media.screens} title={p.title} />
-            : <Image className="sheet-3d" src={visualSrc(p)} alt="" width={640} height={640} sizes="(max-width: 980px) 50vw, 22vw" priority />}
+            : <Image className="stage-3d" src={visualSrc(p)} alt="" width={640} height={640} sizes="(max-width: 640px) 60vw, 360px" priority />}
         </section>
 
-        <div className="sheet-story">
+        <div className="story">
           {p.problem && (
-            <section>
+            <section className="story-row reveal">
               <h2>Le problème</h2>
               <p className="prose">{p.problem}</p>
             </section>
           )}
           {steps.length > 0 && (
-            <section>
+            <section className="story-row reveal">
               <h2>Ce que j’ai fait</h2>
               {steps.length > 1
                 ? <ol className="steps">{steps.map((s) => <li key={s}>{s}</li>)}</ol>
@@ -105,28 +102,30 @@ export default async function ProjectPage({ params }: Props) {
             </section>
           )}
           {p.result && (
-            <section className="sheet-result">
-              <h2>Résultat</h2>
-              <p className="prose">{p.result}</p>
+            <section className="story-result reveal">
+              <h2 className="label">Résultat</h2>
+              <p>{p.result}</p>
             </section>
           )}
         </div>
-      </article>
 
-      {pdfs.length > 0 && (
-        <section className="panel">
-          <h2 className="label">Documents</h2>
-          {pdfs.map((f) => (
-            <div className="pdf" key={f.url}>
-              <div className="pdf-head">
-                <span>{f.name}</span>
-                <a className="link" href={f.url} target="_blank" rel="noopener noreferrer">Ouvrir en plein écran ↗</a>
-              </div>
-              <iframe src={`${f.url}#view=FitH`} title={f.name} loading="lazy" />
+        {pdfs.length > 0 && (
+          <section className="story-row">
+            <h2>Documents</h2>
+            <div>
+              {pdfs.map((f) => (
+                <div className="pdf" key={f.url}>
+                  <div className="pdf-head">
+                    <span>{f.name}</span>
+                    <a className="link" href={f.url} target="_blank" rel="noopener noreferrer">Ouvrir en plein écran ↗</a>
+                  </div>
+                  <iframe src={`${f.url}#view=FitH`} title={f.name} loading="lazy" />
+                </div>
+              ))}
             </div>
-          ))}
-        </section>
-      )}
+          </section>
+        )}
+      </article>
 
       <nav className="pager" aria-label="Autres projets">
         {prev ? <PagerLink project={prev} label="← Projet précédent" /> : <span />}
@@ -135,9 +134,11 @@ export default async function ProjectPage({ params }: Props) {
           : <a className="pager-link next" href="/#projets"><span><span className="label">Fin de la sélection</span><strong>Tous les projets</strong></span></a>}
       </nav>
 
-      <section className="panel dark project-cta">
-        <p>Un poste ou un projet du même type&nbsp;? Parlons-en.</p>
-        <a className="btn pill light" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('À propos du projet ' + p.title)}`}>M’écrire <span aria-hidden="true">→</span></a>
+      <section className="section contact project-cta">
+        <h2 className="contact-title">Un projet du même type&nbsp;?<span className="accent"> Parlons-en.</span></h2>
+        <div className="actions">
+          <a className="btn pill" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('À propos du projet ' + p.title)}`}>M’écrire <span aria-hidden="true">→</span></a>
+        </div>
       </section>
     </Shell>
   );

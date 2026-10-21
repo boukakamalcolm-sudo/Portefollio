@@ -11,6 +11,14 @@ export const METHOD = ['Cartographier', 'Simplifier', 'Construire', 'Ancrer'] as
 
 export type Step = (typeof METHOD)[number];
 
+// Une phrase par étape, affichée sous les mots de la méthode sur l'accueil
+export const METHOD_TEXT: Record<Step, string> = {
+  Cartographier: 'Comprendre comment les équipes travaillent vraiment : les outils, les processus, ce qui fait perdre du temps.',
+  Simplifier: 'Retirer les doublons et les étapes inutiles avant d’ajouter quoi que ce soit.',
+  Construire: 'La solution adaptée : automatisation, intégration, IA ou application sur mesure.',
+  Ancrer: 'Formation, guides et suivi, pour que les nouvelles méthodes tiennent dans la durée.',
+};
+
 export type Experience = {
   id: string;
   period: string;

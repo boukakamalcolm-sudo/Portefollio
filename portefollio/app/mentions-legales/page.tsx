@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function MentionsLegales() {
   return (
     <Shell>
-      <article className="panel legal">
+      <article className="legal">
         <h1>Mentions légales</h1>
 
         <h2>Éditeur du site</h2>
@@ -38,7 +38,7 @@ export default function MentionsLegales() {
           créées avec Canva.
         </p>
 
-        <p className="legal-back"><a href="/">← Retour au site</a></p>
+        <p className="legal-back"><a className="hotspot back-link" href="/"><i aria-hidden="true" />Retour au site</a></p>
       </article>
     </Shell>
   );

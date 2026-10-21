@@ -52,8 +52,8 @@ export default function Experience({ items, education, languages }: {
       </div>
 
       <ol className="xp-track" ref={track} onScroll={update}>
-        {items.map((x, i) => (
-          <li key={x.id} className={`xp-card tone-${i % 3}`}>
+        {items.map((x) => (
+          <li key={x.id} className="xp-card">
             <Image className="xp-logo" src={x.logo} alt="" width={160} height={160} />
             <p className="label">{x.period}</p>
             <h3>{x.role}</h3>
@@ -63,8 +63,8 @@ export default function Experience({ items, education, languages }: {
               : <p className="xp-summary">{x.summary}</p>}
             <ul className="bubbles">{x.skills.slice(0, 3).map((s) => <li key={s}>{s}</li>)}</ul>
             {/* le bouton couvre toute la carte (voir .xp-open::after) */}
-            <button className="xp-open" onClick={() => setOpen(x)} aria-haspopup="dialog">
-              Voir le détail <span aria-hidden="true">+</span>
+            <button className="xp-open hotspot" onClick={() => setOpen(x)} aria-haspopup="dialog">
+              Voir le détail <i aria-hidden="true" />
             </button>
           </li>
         ))}

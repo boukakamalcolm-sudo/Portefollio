@@ -19,25 +19,25 @@ export default async function OgImage() {
 
   return new ImageResponse(
     (
-      <div style={{ width: '100%', height: '100%', display: 'flex', background: '#f7f6f2', fontFamily: 'Outfit', color: '#171715' }}>
+      <div style={{ width: '100%', height: '100%', display: 'flex', background: '#151514', fontFamily: 'Outfit', color: '#f4f3ee' }}>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '60px 64px' }}>
-          <span style={{ ...label, color: '#a94a2a' }}>CHEF DE PROJET SI · PRODUCT BUILDER</span>
+          <span style={{ ...label, color: '#e5764d' }}>CHEF DE PROJET SI · PRODUCT BUILDER</span>
           <div style={{ display: 'flex', flexDirection: 'column', fontSize: 86, lineHeight: 1, letterSpacing: -3.5 }}>
             <span>Malcolm</span>
             <div style={{ display: 'flex' }}>
               <span>Boukaka-Massengo</span>
-              <span style={{ color: '#d96b45' }}>.</span>
+              <span style={{ color: '#e5764d' }}>.</span>
             </div>
-            <div style={{ width: 120, height: 6, background: '#d96b45', marginTop: 34 }} />
+            <div style={{ width: 120, height: 6, background: '#e5764d', marginTop: 34 }} />
           </div>
-          <span style={{ fontSize: 30, color: '#3d3d38', lineHeight: 1.35 }}>
+          <span style={{ fontSize: 30, color: '#a9a8a1', lineHeight: 1.35 }}>
             Processus, automatisation, intégration et IA, du cadrage au déploiement.
           </span>
         </div>
-        <div style={{ width: 360, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 32, background: '#171715' }}>
+        <div style={{ width: 360, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 32, background: '#1d1d1b' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={photoSrc} width={230} height={230} style={{ borderRadius: 115 }} alt="" />
-          <span style={{ ...label, fontSize: 17, color: '#f7f6f2' }}>PARIS · DISPONIBLE</span>
+          <span style={{ ...label, fontSize: 17, color: '#f4f3ee' }}>PARIS · DISPONIBLE</span>
         </div>
       </div>
     ),

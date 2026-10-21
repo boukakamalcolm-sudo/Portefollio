@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from 'react';
 
-// liens absolus : la barre sert aussi sur les pages projet
+// liens absolus : l'en-tête sert aussi sur les pages projet
 const LINKS = [
   ['/#projets', 'Projets'],
+  ['/#methode', 'Méthode'],
   ['/#parcours', 'Parcours'],
-  ['/#contact', 'Contact'],
 ] as const;
 
+// En-tête fixe : nom à gauche, liens discrets et pilule de contact à droite.
+// Sur mobile, les liens s'ouvrent en plein écran.
 export default function Nav({ active }: { active?: string }) {
   const [open, setOpen] = useState(false);
 
@@ -20,16 +22,17 @@ export default function Nav({ active }: { active?: string }) {
   }, [open]);
 
   return (
-    <header className="nav">
+    <header className={`nav${open ? ' is-open' : ''}`}>
       <a className="skip" href="#contenu">Aller au contenu</a>
-      <a className="brand" href="/" aria-label="Malcolm Boukaka-Massengo, accueil">MB<span>.</span></a>
-      <nav id="menu" className={`nav-links${open ? ' open' : ''}`} aria-label="Navigation principale" onClick={() => setOpen(false)}>
+      <a className="brand" href="/" aria-label="Malcolm Boukaka-Massengo, accueil">malcolm<span>.</span></a>
+      <nav id="menu" className="nav-links" aria-label="Navigation principale" onClick={() => setOpen(false)}>
         {LINKS.map(([href, label]) => (
-          <a key={href} href={href} className={active === label ? 'is-active' : undefined}>{label}</a>
+          <a key={href} href={href} aria-current={active === label ? 'page' : undefined}>{label}</a>
         ))}
+        <a className="nav-cta" href="/#contact">Me contacter</a>
       </nav>
       <button
-        className={`nav-toggle${open ? ' open' : ''}`}
+        className="nav-toggle"
         aria-expanded={open}
         aria-controls="menu"
         aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}

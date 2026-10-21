@@ -1,11 +1,16 @@
-import { LEGAL_NAME } from '@/lib/config';
+import { CONTACT_EMAIL, LEGAL_NAME, LINKEDIN_URL, LOCATION } from '@/lib/config';
+import Clock from './Clock';
 
 export default function Footer() {
   return (
     <footer className="footer">
       <span>© {new Date().getFullYear()} {LEGAL_NAME}</span>
       <a href="/mentions-legales">Mentions légales</a>
-      <a href="#top">Retour en haut ↑</a>
+      <span className="footer-links">
+        {LINKEDIN_URL && <><a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn</a>, </>}
+        <a href={`mailto:${CONTACT_EMAIL}`}>E-mail</a>
+      </span>
+      <span>{LOCATION} · <Clock /></span>
     </footer>
   );
 }

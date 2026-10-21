@@ -2,13 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Project, ProjectFile } from '@/lib/types';
+import { projectHref } from '@/lib/format';
 
 const empty = (): Project => ({
   id: '',
   title: '',
   subtitle: '',
   sector: '',
+  role: '',
+  period: '',
   tags: [],
+  stack: [],
   problem: '',
   solution: '',
   result: '',
@@ -81,6 +85,7 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
 }) {
   const [p, setP] = useState<Project>(initial);
   const [tags, setTags] = useState(initial.tags.join(', '));
+  const [stack, setStack] = useState((initial.stack ?? []).join(', '));
   const [uploading, setUploading] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -135,6 +140,7 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
       const projects = await api('PUT', {
         ...p,
         tags: tags.split(',').map((t) => t.trim().toUpperCase()).filter(Boolean),
+        stack: stack.split(',').map((t) => t.trim()).filter(Boolean),
       });
       const kept = new Set(projects.flatMap((x) => x.files.map((f) => f.url)));
       discardUploads(uploads.current.filter((u) => !kept.has(u)));
@@ -152,11 +158,16 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
       <h3>{initial.id ? 'Modifier le projet' : 'Nouveau projet'}</h3>
       <label>Titre *<input value={p.title} onChange={set('title')} required maxLength={120} /></label>
       <label>Accroche<input value={p.subtitle} onChange={set('subtitle')} placeholder="Gestion de stock pour un commerce alimentaire" /></label>
-      <label>Secteur / client<input value={p.sector} onChange={set('sector')} placeholder="Restauration · Paris" /></label>
-      <label>Tags (séparés par des virgules)<input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="STOCK, CAISSE, APPLI WEB" /></label>
-      <label>Le problème<textarea rows={4} value={p.problem} onChange={set('problem')} /></label>
-      <label>Ce qui a été fait<textarea rows={4} value={p.solution} onChange={set('solution')} /></label>
-      <label>Le résultat<textarea rows={3} value={p.result} onChange={set('result')} /></label>
+      <label>Organisation / contexte<input value={p.sector} onChange={set('sector')} placeholder="Ministère de la Culture · Hauts-de-France" /></label>
+      <div className="editor-row">
+        <label>Mon rôle<input value={p.role ?? ''} onChange={set('role')} placeholder="Chef de projet SI" /></label>
+        <label>Période<input value={p.period ?? ''} onChange={set('period')} placeholder="2025 – 2026" /></label>
+      </div>
+      <label>Tags (séparés par des virgules)<input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="CADRAGE, DONNÉES, DÉPLOIEMENT" /></label>
+      <label>Outils (séparés par des virgules)<input value={stack} onChange={(e) => setStack(e.target.value)} placeholder="Jira, BPMN, Power Automate" /></label>
+      <label>Contexte<textarea rows={4} value={p.problem} onChange={set('problem')} /></label>
+      <label>Ce que j’ai fait (une action par ligne)<textarea rows={6} value={p.solution} onChange={set('solution')} /></label>
+      <label>Résultat<textarea rows={3} value={p.result} onChange={set('result')} /></label>
 
       <div className="files">
         <span className="files-title">Fichiers (images et PDF, 4 Mo max ; les photos sont réduites automatiquement). La 1re image sert de couverture.</span>
@@ -238,6 +249,13 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
     run(() => api('DELETE', { id: p.id }), 'Projet supprimé');
   }
 
+  function importDefaults() {
+    const ok = confirm(
+      'Importer les projets du CV ? Ils sont ajoutés ou mis à jour (textes remplacés, images et PDF conservés) et passent en tête de liste. Vos autres projets restent inchangés.',
+    );
+    if (ok) run(() => api('POST', {}), 'Contenu du CV importé');
+  }
+
   function move(i: number, dir: -1 | 1) {
     const j = i + dir;
     if (j < 0 || j >= projects.length) return;
@@ -257,8 +275,8 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
         <a href="/" className="brand">MB<span>.</span></a>
         <span className="label">Espace admin</span>
         <div className="admin-head-actions">
-          <a className="btn-link" href="/" target="_blank" rel="noopener noreferrer">Voir le site ↗</a>
-          <button className="btn-link" onClick={logout}>Déconnexion</button>
+          <a className="link" href="/" target="_blank" rel="noopener noreferrer">Voir le site ↗</a>
+          <button className="link" onClick={logout}>Déconnexion</button>
         </div>
       </header>
 
@@ -287,7 +305,10 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
                 <p className="label">Réalisations</p>
                 <h1>{projects.length} projet{projects.length > 1 ? 's' : ''}</h1>
               </div>
-              <button className="btn" onClick={() => setEditing(empty())} disabled={busy}>+ Ajouter un projet</button>
+              <div className="admin-card-actions">
+                <button className="btn ghost" onClick={importDefaults} disabled={busy || !blobReady}>Importer le contenu du CV</button>
+                <button className="btn" onClick={() => setEditing(empty())} disabled={busy}>+ Ajouter un projet</button>
+              </div>
             </div>
             {error && <p className="form-error" role="alert">{error}</p>}
             <ul className="admin-list">
@@ -300,8 +321,8 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
                       ? <img src={cover.url} alt="" className="admin-thumb" />
                       : <span className="admin-thumb empty">{String(i + 1).padStart(2, '0')}</span>}
                     <div className="admin-item">
-                      <strong>{p.title}</strong>
-                      <small>{p.sector || 'Sans secteur'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}</small>
+                      <strong><a href={projectHref(p.id)} target="_blank" rel="noopener noreferrer">{p.title} ↗</a></strong>
+                      <small>{p.sector || 'Sans contexte'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}</small>
                     </div>
                     <div className="row-actions">
                       <button onClick={() => move(i, -1)} disabled={busy || i === 0} aria-label={`Monter ${p.title}`}>↑</button>

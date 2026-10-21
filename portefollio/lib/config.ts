@@ -1,6 +1,9 @@
-export const SITE_NAME = 'Malcolm Boukaka';
+export const SITE_NAME = 'Malcolm Boukaka-Massengo';
 export const LEGAL_NAME = 'Malcolm Boukaka-Massengo';
+export const ROLE = 'Chef de projet SI · Product builder';
 export const CONTACT_EMAIL = 'boukakamalcolm@gmail.com';
+export const LOCATION = 'Paris';
+export const AVAILABILITY = 'Disponible immédiatement';
 
 // URL publique du site (Vercel > Settings > Environment Variables : NEXT_PUBLIC_SITE_URL).
 export const SITE_URL = (
@@ -12,6 +15,8 @@ export const SITE_URL = (
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/malcolm-b-401a35178/';
 // Lien de prise de rendez-vous (Calendly, Cal.com…). Vide : seul le mail est proposé.
 export const BOOKING_URL = '';
+// CV à télécharger : déposer le PDF dans public/ puis indiquer son chemin (ex. '/cv-malcolm-boukaka-massengo.pdf').
+export const CV_URL = '';
 
 // Mentions légales : à compléter avec les informations de l'entreprise.
 export const LEGAL = {

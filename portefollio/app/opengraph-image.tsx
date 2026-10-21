@@ -2,7 +2,7 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { ImageResponse } from 'next/og';
 
-export const alt = 'Malcolm Boukaka · Outils sur mesure pour PME';
+export const alt = 'Malcolm Boukaka-Massengo · Chef de projet SI & Product builder';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -15,27 +15,29 @@ export default async function OgImage() {
     readFile(join(process.cwd(), 'public/malcolm.jpg')),
   ]);
   const photoSrc = `data:image/jpeg;base64,${photo.toString('base64')}`;
-  const label = { fontFamily: 'Mono', fontSize: 20, letterSpacing: 1, color: '#6b6763' } as const;
+  const label = { fontFamily: 'Mono', fontSize: 20, letterSpacing: 1.5 } as const;
 
   return new ImageResponse(
     (
-      <div style={{ width: '100%', height: '100%', display: 'flex', background: '#f4f2f1', fontFamily: 'Outfit', color: '#2b2b2b' }}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '56px 60px', borderRight: '1px solid #cfc9c3' }}>
-          <span style={label}>OUTILS SUR MESURE POUR PME</span>
-          <div style={{ display: 'flex', flexDirection: 'column', fontSize: 104, lineHeight: 1, letterSpacing: -4 }}>
-            <span>Moins d’Excel.</span>
+      <div style={{ width: '100%', height: '100%', display: 'flex', background: '#f7f6f2', fontFamily: 'Outfit', color: '#171715' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '60px 64px' }}>
+          <span style={{ ...label, color: '#a94a2a' }}>CHEF DE PROJET SI · PRODUCT BUILDER</span>
+          <div style={{ display: 'flex', flexDirection: 'column', fontSize: 86, lineHeight: 1, letterSpacing: -3.5 }}>
+            <span>Malcolm</span>
             <div style={{ display: 'flex' }}>
-              <span>Plus de&nbsp;</span>
-              <span style={{ background: '#feffa7', padding: '0 8px' }}>temps.</span>
+              <span>Boukaka-Massengo</span>
+              <span style={{ color: '#d96b45' }}>.</span>
             </div>
+            <div style={{ width: 120, height: 6, background: '#d96b45', marginTop: 34 }} />
           </div>
-          <span style={{ fontSize: 28, color: '#494949' }}>Devis, commandes, plannings, suivi clients.</span>
+          <span style={{ fontSize: 30, color: '#3d3d38', lineHeight: 1.35 }}>
+            Processus, automatisation, intégration et IA, du cadrage au déploiement.
+          </span>
         </div>
-        <div style={{ width: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, background: '#feffa7' }}>
+        <div style={{ width: 360, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 32, background: '#171715' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photoSrc} width={250} height={250} style={{ borderRadius: 125, border: '1px solid #2b2b2b', filter: 'grayscale(1)' }} alt="" />
-          <span style={{ ...label, color: '#2b2b2b' }}>PAPIER → EXCEL → OUTIL</span>
-          <span style={{ fontSize: 26 }}>Malcolm Boukaka</span>
+          <img src={photoSrc} width={230} height={230} style={{ borderRadius: 115 }} alt="" />
+          <span style={{ ...label, fontSize: 17, color: '#f7f6f2' }}>PARIS · DISPONIBLE</span>
         </div>
       </div>
     ),

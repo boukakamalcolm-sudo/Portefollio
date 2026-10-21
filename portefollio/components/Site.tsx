@@ -1,444 +1,154 @@
-'use client';
-
-import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import type { Project } from '@/lib/types';
-import { BOOKING_URL, CONTACT_EMAIL, LEGAL_NAME, LINKEDIN_URL } from '@/lib/config';
+import { AVAILABILITY, BOOKING_URL, CONTACT_EMAIL, CV_URL, LINKEDIN_URL, LOCATION, ROLE } from '@/lib/config';
+import { ABOUT, EDUCATION, FIGURES, LANGUAGES, METHOD, PITCH, SKILLS, XP } from '@/lib/profile';
+import { pad, projectHref } from '@/lib/format';
+import AdminGear from './AdminGear';
+import Footer from './Footer';
+import Nav from './Nav';
+import ProjectCard from './ProjectCard';
 
+const external = { target: '_blank', rel: 'noopener noreferrer' } as const;
 
-const XP = [
-  {
-    period: '2025 – 2026',
-    role: 'Conseiller SI · pilotage & stratégie',
-    org: 'Ministère de la Culture',
-    text: 'Cartographie du système d’information et des outils de 18 directions régionales. Contribution au cadrage et au déploiement d’un outil de suivi d’indicateurs dans le réseau des musées, de la définition des données à la mise en service.',
-  },
-  {
-    period: '2024 – 2025',
-    role: 'Chef de projet AMOA / transformation',
-    org: 'Covéa Protection Juridique',
-    text: 'Contribution à des projets de transformation des usages : environnement Microsoft 365, Teams et SharePoint, digital workplace et gestion documentaire. Interface entre besoins métiers, utilisateurs et solutions SI.',
-  },
-  {
-    period: '2022 – 2024',
-    role: 'Customer Success Manager',
-    org: 'Beekast · éditeur SaaS',
-    text: 'Déploiement de la solution, cadrage des besoins clients, animation d’ateliers et de formations, analyse des usages et coordination avec les équipes produit, marketing et SI. Une expérience au contact direct des utilisateurs et de leurs retours produit.',
-  },
-];
+export default function Site({ projects }: { projects: Project[] }) {
+  const byId = new Map(projects.map((p) => [p.id, p]));
 
-function Cover({ project, index }: { project: Project; index: number }) {
-  const img = project.files.find((f) => f.kind === 'image');
-  const accent = ['yellow', 'dark', 'grey'][index % 3];
-  if (img) {
-    return (
-      <div className={`project-visual ${accent}`}>
-        <Image src={img.url} alt="" fill className="cover-img" sizes="(max-width: 900px) 84vw, 44vw" draggable={false} />
-        <span className="visual-label">{pad(index + 1)} / {project.title}</span>
-      </div>
-    );
-  }
   return (
-    <div className={`project-visual ${accent}`} aria-hidden="true">
-      <div className="visual-grid" />
-      <div className="visual-window">
-        <div className="window-top"><span /><span /><span /></div>
-        <div className="window-body">
-          <div className="fake-sidebar"><i /><i /><i /><i /></div>
-          <div className="fake-content">
-            <div className="fake-line long" /><div className="fake-line" />
-            <div className="fake-cards"><b /><b /><b /></div>
-            <div className="fake-chart"><span /><span /><span /><span /><span /></div>
+    <>
+      <Nav />
+      <main id="contenu">
+        <section className="hero">
+          <div className="hero-intro">
+            <p className="label accent">{ROLE}</p>
+            <h1>Malcolm<br />Boukaka-Massengo<span className="dot">.</span></h1>
+            <p className="hero-pitch">{PITCH}</p>
+            <p className="hero-meta"><span>{LOCATION}</span><span className="available">{AVAILABILITY}</span></p>
+            <div className="actions">
+              <a className="btn" href="#projets">Voir les projets</a>
+              <a className="btn ghost" href="#contact">Me contacter</a>
+              {CV_URL && <a className="link" href={CV_URL} download>Télécharger le CV</a>}
+            </div>
           </div>
-        </div>
-      </div>
-      <span className="visual-label">{pad(index + 1)} / {project.title}</span>
-    </div>
-  );
-}
 
-function Carousel({ projects, onOpen }: { projects: Project[]; onOpen: (i: number) => void }) {
-  const track = useRef<HTMLDivElement>(null);
-  const [current, setCurrent] = useState(0);
-  const [edges, setEdges] = useState({ start: true, end: false });
-  const drag = useRef({ down: false, x: 0, left: 0, moved: false });
+          {projects.length > 0 && (
+            <nav className="hero-index" aria-labelledby="index-title">
+              <p className="label" id="index-title">Accès direct aux projets</p>
+              <ol>
+                {projects.map((p, i) => (
+                  <li key={p.id}>
+                    <a href={projectHref(p.id)}>
+                      <span className="num">{pad(i + 1)}</span>
+                      <span><strong>{p.title}</strong><small>{p.sector}</small></span>
+                      <span className="arrow" aria-hidden="true">→</span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )}
+        </section>
 
-  const update = useCallback(() => {
-    const el = track.current;
-    if (!el) return;
-    const cards = Array.from(el.children) as HTMLElement[];
-    const start = el.getBoundingClientRect().left + parseFloat(getComputedStyle(el).paddingLeft || '0');
-    let idx = 0;
-    let best = Infinity;
-    cards.forEach((c, i) => {
-      const d = Math.abs(c.getBoundingClientRect().left - start);
-      if (d < best) { best = d; idx = i; }
-    });
-    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 5;
-    setCurrent(atEnd ? cards.length - 1 : idx);
-    setEdges({ start: el.scrollLeft < 5, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 5 });
-  }, []);
+        <ul className="figures" aria-label="Quelques repères">
+          {FIGURES.map(([n, text]) => (
+            <li key={text}><strong>{n}</strong><span>{text}</span></li>
+          ))}
+        </ul>
 
-  useEffect(() => {
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, [update, projects.length]);
+        <section className="section" id="projets">
+          <header className="section-head">
+            <p className="label">01 / Projets</p>
+            <h2>Projets<span>.</span></h2>
+            <p>Systèmes d’information, IA et produits construits de bout en bout. Chaque projet a sa page : contexte, ce que j’ai fait, résultat.</p>
+          </header>
+          {projects.length ? (
+            <div className="grid">
+              {projects.map((p, i) => <ProjectCard key={p.id} project={p} index={i} />)}
+            </div>
+          ) : (
+            <p>Aucun projet pour l’instant.</p>
+          )}
+        </section>
 
-  const go = (dir: 1 | -1) => {
-    const el = track.current;
-    if (!el) return;
-    const card = el.children[0] as HTMLElement | undefined;
-    const step = card ? card.offsetWidth + parseFloat(getComputedStyle(el).columnGap || '0') : el.clientWidth;
-    el.scrollBy({ left: dir * step, behavior: 'smooth' });
-  };
-
-  // glisser à la souris sur desktop
-  const onPointerDown = (e: React.PointerEvent) => {
-    if (e.pointerType !== 'mouse' || !track.current) return;
-    drag.current = { down: true, x: e.clientX, left: track.current.scrollLeft, moved: false };
-  };
-  const onPointerMove = (e: React.PointerEvent) => {
-    const d = drag.current;
-    if (!d.down || !track.current) return;
-    const dx = e.clientX - d.x;
-    if (Math.abs(dx) > 5 && !d.moved) {
-      d.moved = true;
-      track.current.classList.add('dragging');
-    }
-    if (d.moved) track.current.scrollLeft = d.left - dx;
-  };
-  const endDrag = () => {
-    drag.current.down = false;
-    track.current?.classList.remove('dragging');
-  };
-
-  if (!projects.length) return <p className="empty">Aucun projet pour l’instant.</p>;
-
-  return (
-    <div className="carousel">
-      <div
-        className="carousel-track"
-        ref={track}
-        onScroll={update}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerLeave={endDrag}
-        tabIndex={0}
-        role="region"
-        aria-label="Réalisations, faire défiler avec les flèches du clavier"
-        onKeyDown={(e) => {
-          if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
-          if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
-        }}
-      >
-        {projects.map((p, i) => (
-          <article className="project-card" key={p.id}>
-            <Cover project={p} index={i} />
-            <div className="project-info">
-              <div>
-                <span className="project-number">{pad(i + 1)} · {p.sector}</span>
-                <h3>
-                  {/* le bouton couvre toute la carte (voir .project-open::after) */}
-                  <button
-                    className="project-open"
-                    onClick={(e) => {
-                      if (drag.current.moved) { e.preventDefault(); drag.current.moved = false; return; }
-                      onOpen(i);
-                    }}
-                  >
-                    {p.title}
-                  </button>
-                </h3>
-                <p>{p.subtitle}</p>
+        <section className="section" id="parcours">
+          <header className="section-head">
+            <p className="label">02 / Parcours</p>
+            <h2>Parcours<span>.</span></h2>
+          </header>
+          <div className="about">
+            <div className="portrait">
+              <Image src="/malcolm.jpg" alt="Portrait de Malcolm Boukaka-Massengo" width={552} height={552} sizes="(max-width: 760px) 200px, 280px" />
+            </div>
+            <div>
+              <p className="about-intro">{ABOUT}</p>
+              <ol className="xp">
+                {XP.map((x) => {
+                  const related = x.projects.map((id) => byId.get(id)).filter((p): p is Project => !!p);
+                  return (
+                    <li key={x.org}>
+                      <p className="label">{x.period}</p>
+                      <div>
+                        <h3>{x.role}</h3>
+                        <p className="xp-org">{x.org}</p>
+                        <p className="xp-text">{x.text}</p>
+                        {related.length > 0 && (
+                          <p className="xp-links">
+                            {related.map((p) => <a key={p.id} className="link" href={projectHref(p.id)}>{p.title} →</a>)}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+              <div className="edu">
+                <h3 className="label">Formation</h3>
+                <ul>
+                  {EDUCATION.map(([year, degree, school]) => (
+                    <li key={degree}><span className="label">{year}</span><span><strong>{degree}</strong>{school}</span></li>
+                  ))}
+                </ul>
+                <p><span className="label">Langues</span> {LANGUAGES}</p>
               </div>
-              <span className="view" aria-hidden="true">Voir ↗</span>
             </div>
-            <div className="tags">{p.tags.map((t) => <span key={t}>{t}</span>)}</div>
-          </article>
-        ))}
-      </div>
-      <div className="carousel-controls">
-        <span className="carousel-count">{pad(current + 1)} / {pad(projects.length)}</span>
-        <div className="carousel-bar"><i style={{ width: `${((current + 1) / projects.length) * 100}%` }} /></div>
-        <div className="carousel-arrows">
-          <button onClick={() => go(-1)} disabled={edges.start} aria-label="Projet précédent">←</button>
-          <button onClick={() => go(1)} disabled={edges.end} aria-label="Projet suivant">→</button>
-        </div>
-      </div>
-    </div>
-  );
-}
+          </div>
+        </section>
 
-const FOCUSABLE = 'a[href], button:not([disabled]), iframe, input, textarea, select, [tabindex]:not([tabindex="-1"])';
-
-// garde le focus clavier dans la fenêtre ouverte
-function trapTab(e: KeyboardEvent, root: HTMLElement | null) {
-  if (e.key !== 'Tab' || !root) return;
-  const items = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE));
-  if (!items.length) return;
-  const first = items[0];
-  const last = items[items.length - 1];
-  if (e.shiftKey && (document.activeElement === first || !root.contains(document.activeElement))) {
-    e.preventDefault();
-    last.focus();
-  } else if (!e.shiftKey && (document.activeElement === last || !root.contains(document.activeElement))) {
-    e.preventDefault();
-    first.focus();
-  }
-}
-
-function CaseModal({ project, index, onClose }: { project: Project; index: number; onClose: () => void }) {
-  const closeRef = useRef<HTMLButtonElement>(null);
-  const modalRef = useRef<HTMLElement>(null);
-  const lightboxRef = useRef<HTMLDivElement>(null);
-  const [zoom, setZoom] = useState<{ url: string; alt: string } | null>(null);
-  const images = project.files.filter((f) => f.kind === 'image');
-  const pdfs = project.files.filter((f) => f.kind === 'pdf');
-
-  useEffect(() => {
-    const prev = document.activeElement as HTMLElement | null;
-    closeRef.current?.focus();
-    return () => prev?.focus();
-  }, []);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') (zoom ? setZoom(null) : onClose());
-      trapTab(e, zoom ? lightboxRef.current : modalRef.current);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose, zoom]);
-
-  useEffect(() => {
-    if (zoom) lightboxRef.current?.querySelector('button')?.focus();
-  }, [zoom]);
-
-  return (
-    <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <article ref={modalRef} className="modal" role="dialog" aria-modal="true" aria-labelledby="case-title">
-        <button ref={closeRef} className="modal-close" onClick={onClose} aria-label="Fermer">×</button>
-        <div className="modal-hero">
-          <span>{pad(index + 1)} / {project.sector}</span>
-          <h2 id="case-title">{project.title}</h2>
-          <p>{project.subtitle}</p>
-        </div>
-
-        <div className="case-meta">
-          <div><small>LE PROBLÈME</small><p>{project.problem}</p></div>
-          <div><small>CE QUI A ÉTÉ FAIT</small><p>{project.solution}</p></div>
-        </div>
-
-        {images.length > 0 && (
-          <section className="case-block">
-            <small>CAPTURES</small>
-            <div className="gallery">
-              {images.map((f, i) => {
-                const alt = `${project.title}, capture ${i + 1} sur ${images.length}`;
-                return (
-                  <button key={f.url} onClick={() => setZoom({ url: f.url, alt })} aria-label={`Agrandir : ${alt}`}>
-                    <Image
-                      src={f.url}
-                      alt={alt}
-                      width={1200}
-                      height={800}
-                      sizes={images.length === 1 ? '(max-width: 1300px) 90vw, 1150px' : '(max-width: 900px) 90vw, 400px'}
-                    />
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {pdfs.length > 0 && (
-          <section className="case-block">
-            <small>DOCUMENTS</small>
-            {pdfs.map((f) => (
-              <div className="pdf" key={f.url}>
-                <div className="pdf-head">
-                  <span>{f.name}</span>
-                  <a href={f.url} target="_blank" rel="noopener noreferrer">OUVRIR EN PLEIN ÉCRAN ↗</a>
-                </div>
-                <iframe src={`${f.url}#view=FitH`} title={f.name} loading="lazy" />
+        <section className="section" id="competences">
+          <header className="section-head">
+            <p className="label">03 / Compétences</p>
+            <h2>Ma façon de travailler<span>.</span></h2>
+          </header>
+          <ol className="method">
+            {METHOD.map(([step, text], i) => (
+              <li key={step}><span className="label accent">{pad(i + 1)}</span><strong>{step}</strong><span>{text}</span></li>
+            ))}
+          </ol>
+          <div className="skills">
+            {SKILLS.map((s) => (
+              <div key={s.title}>
+                <h3>{s.title}</h3>
+                <ul className="chips">{s.items.map((it) => <li key={it}>{it}</li>)}</ul>
               </div>
             ))}
-          </section>
-        )}
-
-        <div className="case-result">
-          <small>LE RÉSULTAT</small>
-          <h3>Ce qui a changé</h3>
-          <p>{project.result}</p>
-          <a className="result-cta" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Un projet comme ' + project.title)}`}>
-            Un besoin similaire ? Parlons-en →
-          </a>
-        </div>
-      </article>
-
-      {zoom && (
-        <div ref={lightboxRef} className="lightbox" onClick={() => setZoom(null)} role="dialog" aria-modal="true" aria-label="Image agrandie">
-          <button className="lightbox-close" onClick={() => setZoom(null)} aria-label="Fermer l’image">×</button>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={zoom.url} alt={zoom.alt} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function Site({ initialProjects }: { initialProjects: Project[] }) {
-  const [projects] = useState(initialProjects);
-  const [active, setActive] = useState<number | null>(null);
-  const [admin, setAdmin] = useState(false);
-  const [menu, setMenu] = useState(false);
-
-  // la page est statique : le statut admin est lu après chargement
-  useEffect(() => {
-    fetch('/api/auth', { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : { admin: false }))
-      .then((j) => setAdmin(!!j.admin))
-      .catch(() => {});
-  }, []);
-
-
-  // surligneurs qui se dessinent à l'arrivée à l'écran
-  useEffect(() => {
-    const els = document.querySelectorAll('[data-reveal]');
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add('in');
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.6 });
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!menu) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenu(false);
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [menu]);
-
-  useEffect(() => {
-    document.body.style.overflow = active !== null ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [active]);
-
-  const close = useCallback(() => setActive(null), []);
-  const activeProject = active !== null ? projects[active] : null;
-
-  return (
-    <main>
-      <nav className="nav">
-        <a className="brand" href="#top" aria-label="Malcolm Boukaka, retour en haut">MB<span>.</span></a>
-        <div className={`nav-links${menu ? ' open' : ''}`} id="menu" onClick={() => setMenu(false)}>
-          <a href="#work">Projets</a><a href="#apropos">Parcours</a><a href="#contact">Contact</a>
-        </div>
-        <div className="nav-end">
-          <a className="nav-cta" href="#contact">Contact ↗</a>
-          <button className="nav-toggle" aria-expanded={menu} aria-controls="menu" onClick={() => setMenu(!menu)}>
-            {menu ? 'Fermer' : 'Menu'}
-          </button>
-        </div>
-      </nav>
-
-      <section className="hero" id="top">
-        <div className="hero-text">
-          <p className="label">PRODUCT MANAGER · PRODUCT OWNER</p>
-          <h1 className="hero-title" data-reveal>Malcolm<br /><mark>Boukaka.</mark></h1>
-          <p className="hero-sub">Je conçois des solutions utiles à la croisée du métier, des utilisateurs et de la technologie.</p>
-          <div className="hero-actions">
-            <a className="btn-primary" href="#work">Voir les projets ↘</a>
-            {LINKEDIN_URL && <a className="btn-link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>}
           </div>
-        </div>
-        <div className="hero-card" aria-hidden="true">
-          <HeroDash />
-          <p className="hero-flow">
-            <span>Discovery</span><b>→</b><span>Delivery</span><b>→</b><span>Impact</span>
-          </p>
-        </div>
-      </section>
+        </section>
 
-      <section className="work block grey" id="work">
-        <header className="block-head">
-          <p className="label">01 / Projets sélectionnés</p>
-          <h2>Selected work<span className="heading-period">.</span></h2>
-        </header>
-        <Carousel projects={projects} onOpen={setActive} />
-      </section>
-
-      <section className="about block" id="apropos">
-        <header className="block-head">
-          <p className="label">02 / Parcours</p>
-          <h2>Expérience<span className="heading-period">.</span></h2>
-        </header>
-        <div className="about-grid">
-          <div className="about-photo">
-            <Image src="/malcolm.jpg" alt="Portrait de Malcolm Boukaka" width={552} height={552} sizes="(max-width: 900px) 90vw, 30vw" />
+        <section className="section contact" id="contact">
+          <header className="section-head">
+            <p className="label">04 / Contact</p>
+            <h2>On se parle<span> ?</span></h2>
+            <p>Ouvert aux postes de chef de projet SI et de product builder. Basé à {LOCATION}, {AVAILABILITY.toLowerCase()}.</p>
+          </header>
+          <a className="contact-mail" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          <div className="actions">
+            {LINKEDIN_URL && <a className="btn" href={LINKEDIN_URL} {...external}>LinkedIn ↗</a>}
+            {CV_URL && <a className="btn ghost" href={CV_URL} download>Télécharger le CV</a>}
+            {BOOKING_URL && <a className="btn ghost" href={BOOKING_URL} {...external}>Réserver un créneau ↗</a>}
           </div>
-          <div className="about-body">
-            <p className="about-intro">Du SaaS aux systèmes d’information, j’interviens à l’interface entre utilisateurs, équipes métier et équipes techniques — du cadrage à l’adoption.</p>
-            <ol className="xp">
-              {XP.map((x) => (
-                <li key={x.org}>
-                  <span className="label">{x.period}</span>
-                  <div>
-                    <h3>{x.role} <small>· {x.org}</small></h3>
-                    <p>{x.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <p className="about-edu">
-              <span className="label">Formation</span>
-              Master Conseil et management des systèmes d’information, Institut Mines-Télécom (2026) · Bachelor INSEEC
-              Business School · DUT Techniques de commercialisation
-            </p>
-            {LINKEDIN_URL && <a className="btn-link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">Voir mon profil LinkedIn ↗</a>}
-          </div>
-        </div>
-      </section>
-
-      <section className="contact block yellow" id="contact">
-        <header className="block-head">
-          <p className="label">03 / Contact</p>
-          <h2>On se parle<span className="heading-period"> ?</span></h2>
-        </header>
-        <div className="contact-grid">
-          <div className="contact-side">
-            <p>Ouvert aux opportunités Product Manager et Product Owner.</p>
-            <div className="contact-links">
-              {BOOKING_URL && <a className="btn-link" href={BOOKING_URL} target="_blank" rel="noopener noreferrer">Réserver un créneau ↗</a>}
-              <a className="contact-email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-              {LINKEDIN_URL && <a className="btn-link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <footer>
-        <span>© {new Date().getFullYear()} {LEGAL_NAME}</span>
-        <span>Product · Delivery · Impact</span>
-        <a href="#top">Retour en haut ↑</a>
-      </footer>
-
-      {activeProject && <CaseModal project={activeProject} index={active!} onClose={close} />}
-      {admin && (
-        <a className="gear" href="/admin" aria-label="Gérer les projets" title="Gérer les projets">
-          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-            <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.62.06-.94s-.02-.63-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.92 2h-3.840a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.72 8.470a.48.48 0 0 0 .12.61l2.03 1.58c-.05.31-.07.63-.07.94s.02.63.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.620-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z" />
-          </svg>
-        </a>
-      )}
-    </main>
+        </section>
+      </main>
+      <Footer />
+      <AdminGear />
+    </>
   );
 }

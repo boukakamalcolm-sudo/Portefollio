@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/lib/auth';
 import { blobReady, getProjects, saveProjects, deleteFiles } from '@/lib/store';
+import { seedProjects } from '@/lib/seed';
 import type { Project } from '@/lib/types';
 
 // fichiers servis par /api/file (Blob privé), ou anciennes URL publiques Vercel Blob
 const FILE_URL = /^(\/api\/file\/projets\/[\w.\-]+|https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/.+)$/i;
 const readJson = (req: Request) => req.json().catch(() => null);
 const str = (v: unknown, max = 4000) => (typeof v === 'string' ? v.slice(0, max).trim() : '');
+const strs = (v: unknown, count: number) => (Array.isArray(v) ? v.map((t) => str(t, 40)).filter(Boolean).slice(0, count) : []);
+// comparaison de titres sans accents, casse ni ponctuation
+const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '');
 
 function clean(input: Partial<Project>): Project {
   input = input && typeof input === 'object' ? input : {};
@@ -15,7 +19,10 @@ function clean(input: Partial<Project>): Project {
     title: str(input.title, 120),
     subtitle: str(input.subtitle, 200),
     sector: str(input.sector, 120),
-    tags: Array.isArray(input.tags) ? input.tags.map((t) => str(t, 40)).filter(Boolean).slice(0, 8) : [],
+    role: str(input.role, 120),
+    period: str(input.period, 60),
+    tags: strs(input.tags, 8),
+    stack: strs(input.stack, 12),
     problem: str(input.problem),
     solution: str(input.solution),
     result: str(input.result),
@@ -56,6 +63,26 @@ export async function PUT(req: Request) {
     await saveProjects(projects);
   }
   return NextResponse.json({ projects });
+}
+
+// Importer le contenu de départ (lib/seed.ts) : chaque projet est reconnu par son identifiant ou son titre.
+// Les textes sont remplacés, les images et PDF déjà envoyés sont conservés.
+// Les projets importés passent en tête, dans l'ordre du contenu de départ ; les autres suivent, inchangés.
+export async function POST() {
+  if (!(await isAdmin())) return deny();
+  if (!blobReady()) return noStore();
+  const current = await getProjects();
+  const used = new Set<string>();
+  const imported = seedProjects.map((seed) => {
+    const free = current.filter((p) => !used.has(p.id));
+    const match = free.find((p) => p.id === seed.id) ?? free.find((p) => norm(p.title) === norm(seed.title));
+    if (!match) return seed;
+    used.add(match.id);
+    return { ...seed, id: match.id, files: match.files };
+  });
+  const next = [...imported, ...current.filter((p) => !used.has(p.id))];
+  await saveProjects(next);
+  return NextResponse.json({ projects: next });
 }
 
 // Supprimer un projet

@@ -11,7 +11,12 @@ export type Project = {
   sector: string;
   tags: string[];
   problem: string;
+  // une ligne par action
   solution: string;
   result: string;
   files: ProjectFile[];
+  // absents des projets enregistrés avant l'ajout de ces champs
+  role?: string;
+  period?: string;
+  stack?: string[];
 };

@@ -14,6 +14,7 @@ const readJson = (req: Request) => req.json().catch(() => null);
 const str = (v: unknown, max = 4000) => (typeof v === 'string' ? v.slice(0, max).trim() : '');
 const strs = (v: unknown, count: number) => (Array.isArray(v) ? v.map((t) => str(t, 40)).filter(Boolean).slice(0, count) : []);
 // comparaison de titres sans accents, casse ni ponctuation
+const px = (v: unknown) => (Number.isInteger(v) && (v as number) > 0 && (v as number) <= 20000 ? (v as number) : 0);
 const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '');
 
 function clean(input: Partial<Project>): Project {
@@ -46,6 +47,7 @@ function clean(input: Partial<Project>): Project {
               name: str(f.name, 200),
               kind,
               ...(kind === 'image' ? { title: str(f.title, 80), caption: str(f.caption, 300) } : {}),
+              ...(kind === 'image' && px(f.width) && px(f.height) ? { width: px(f.width), height: px(f.height) } : {}),
               ...(isIcon ? { icon: true } : {}),
             };
           })

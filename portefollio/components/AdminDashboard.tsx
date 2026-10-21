@@ -79,6 +79,18 @@ function discardUploads(urls: string[]) {
   }).catch(() => {});
 }
 
+// largeur et hauteur de l'image, pour distinguer une capture paysage d'un écran de téléphone
+async function imageSize(data: Blob) {
+  try {
+    const bitmap = await createImageBitmap(data);
+    const size = { width: bitmap.width, height: bitmap.height };
+    bitmap.close();
+    return size;
+  } catch {
+    return {};
+  }
+}
+
 function Editor({ initial, onCancel, onSaved, uploads }: {
   initial: Project;
   onCancel: () => void;
@@ -116,7 +128,7 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
         }
         const url = await sendFile(data, file.name, (pct) => setUploading(`Envoi de ${file.name} : ${Math.round(pct)} %`));
         uploads.current.push(url);
-        added.push({ url, name: file.name, kind: isPdf ? 'pdf' : 'image' });
+        added.push({ url, name: file.name, kind: isPdf ? 'pdf' : 'image', ...(isPdf ? {} : await imageSize(data)) });
       } catch (e) {
         setError(`${file.name} : ${(e as Error).message}`);
       }

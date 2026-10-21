@@ -15,17 +15,24 @@ export function visualStyle(color: string, index: number) {
     : { className: projectTone(index), style: undefined };
 }
 
-// Visuel : écrans de l'application côte à côte (ou capture unique) avec son icône sur le côté,
-// sinon l'objet 3D du projet
+// Visuel : visuels de présentation empilés, ou écrans de l'application côte à côte (ou capture unique)
+// avec son icône sur le côté, sinon l'objet 3D du projet
 export default function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const { icon, screens, color } = projectMedia(project);
+  const { icon, screens, wide, color } = projectMedia(project);
   const logo = icon ?? visualSrc(project);
   const bg = visualStyle(color, index);
   const sizes = '(max-width: 640px) 46vw, (max-width: 1100px) 45vw, 640px';
   return (
     <article className="work reveal">
       <div className={`work-visual ${bg.className}`} style={bg.style}>
-        {screens.length > 1 ? (
+        {wide ? (
+          // visuels de présentation empilés, le premier devant
+          <div className="screens-deck">
+            {screens.slice(0, 3).reverse().map((s, i, all) => (
+              <Image key={s.url} src={s.url} alt="" width={s.width} height={s.height} sizes={sizes} priority={index < 2 && i === all.length - 1} />
+            ))}
+          </div>
+        ) : screens.length > 1 ? (
           <>
             <div className="screens-fan">
               {screens.slice(0, 3).map((s, i) => (

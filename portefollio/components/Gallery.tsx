@@ -12,6 +12,7 @@ export default function Gallery({ screens, title }: { screens: ProjectFile[]; ti
   const [zoom, setZoom] = useState<{ url: string; alt: string } | null>(null);
   const [edges, setEdges] = useState({ start: true, end: false });
   const many = screens.length > 1;
+  const wide = (screens[0]?.width ?? 0) > (screens[0]?.height ?? Infinity);
 
   const update = useCallback(() => {
     const el = track.current;
@@ -34,7 +35,7 @@ export default function Gallery({ screens, title }: { screens: ProjectFile[]; ti
   return (
     <>
       <div className="screens-head">
-        <p className="label">{many ? 'L’application, écran par écran' : 'Capture'}</p>
+        <p className="label">{wide ? 'L’application en images' : many ? 'L’application, écran par écran' : 'Capture'}</p>
         {many && (
           <div className="xp-arrows">
             <button onClick={() => go(-1)} disabled={edges.start} aria-label="Écrans précédents">←</button>
@@ -42,13 +43,21 @@ export default function Gallery({ screens, title }: { screens: ProjectFile[]; ti
           </div>
         )}
       </div>
-      <ol className={`screens-track${many ? '' : ' single'}`} ref={track} onScroll={update}>
+      <ol className={`screens-track${many ? '' : ' single'}${wide ? ' wide' : ''}`} ref={track} onScroll={update}>
         {screens.map((s, i) => {
-          const alt = s.title ? `${title}, écran ${s.title}` : `${title}, capture ${i + 1} sur ${screens.length}`;
+          // le nom d'un fichier envoyé depuis l'admin (« IMG_123.png ») ne décrit pas l'image
+          const named = s.name && !/\.\w{3,4}$/.test(s.name);
+          const alt = s.title ? `${title}, écran ${s.title}` : named ? `${title}, ${s.name}` : `${title}, capture ${i + 1} sur ${screens.length}`;
           return (
             <li key={s.url}>
               <button onClick={() => { setZoom({ url: s.url, alt }); dialog.current?.showModal(); }} aria-label={`Agrandir : ${alt}`}>
-                <Image src={s.url} alt={alt} width={600} height={640} sizes={many ? '(max-width: 640px) 72vw, 260px' : '(max-width: 980px) 90vw, 50vw'} />
+                <Image
+                  src={s.url}
+                  alt={alt}
+                  width={s.width ?? 600}
+                  height={s.height ?? 640}
+                  sizes={wide ? '(max-width: 640px) 86vw, 900px' : many ? '(max-width: 640px) 72vw, 260px' : '(max-width: 980px) 90vw, 50vw'}
+                />
               </button>
               {s.title && <h3>{s.title}</h3>}
               {s.caption && <p>{s.caption}</p>}

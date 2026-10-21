@@ -69,16 +69,12 @@ export const seedProjects: Project[] = [
     ].join('\n'),
     result:
       'Le stock, les ventes et la caisse sont consultables à tout moment, y compris à distance. Le gérant sait chaque soir ce qui a été vendu, ce qui reste en rayon et ce qu’il y a réellement en caisse.',
-    // écrans reconstitués d'après les visuels de l'application (public/captures/marche-ya-cina)
+    // visuels de présentation de l'application (public/captures/marche-ya-cina) : le texte est dans l'image
     files: [
       { url: '/captures/marche-ya-cina/icone.png', name: 'Icône de Marché ya Cina', kind: 'image', icon: true },
-      { url: '/captures/marche-ya-cina/ventes.jpg', name: 'Écran Journée', kind: 'image', title: 'Ventes', caption: 'Suivre les ventes en temps réel et analyser ses performances.' },
-      { url: '/captures/marche-ya-cina/pilotage.jpg', name: 'Écran Pilotage', kind: 'image', title: 'Pilotage', caption: 'Voir ses performances du mois en un coup d’œil.' },
-      { url: '/captures/marche-ya-cina/stock.jpg', name: 'Écran Stock', kind: 'image', title: 'Stock', caption: 'Garder le contrôle des produits et anticiper les ruptures.' },
-      { url: '/captures/marche-ya-cina/caisse.jpg', name: 'Écran Caisse', kind: 'image', title: 'Caisse', caption: 'Gérer les encaissements et les mouvements simplement.' },
-      { url: '/captures/marche-ya-cina/alertes.jpg', name: 'Écran Alertes', kind: 'image', title: 'Alertes', caption: 'Ne jamais manquer un stock important.' },
-      { url: '/captures/marche-ya-cina/periode.jpg', name: 'Écran Ventes sur une période', kind: 'image', title: 'Période', caption: 'Analyser ses ventes sur n’importe quelle période.' },
-      { url: '/captures/marche-ya-cina/produits.jpg', name: 'Écran Nouveau produit', kind: 'image', title: 'Produits', caption: 'Ajouter et organiser ses produits facilement.' },
+      { url: '/captures/marche-ya-cina/ventes.webp', name: 'Ventes : suivre ses ventes en temps réel', kind: 'image', width: 1672, height: 941 },
+      { url: '/captures/marche-ya-cina/caisse.webp', name: 'Caisse : gérer ses encaissements au quotidien', kind: 'image', width: 1672, height: 941 },
+      { url: '/captures/marche-ya-cina/pilotage.webp', name: 'Pilotage : analyser ses performances en un coup d’œil', kind: 'image', width: 1672, height: 941 },
     ],
   },
   {

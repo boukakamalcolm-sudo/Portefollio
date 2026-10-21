@@ -144,6 +144,14 @@ h1, h2, h3 { margin: 0; color: var(--ink); font-weight: 600; letter-spacing: -.0
 .screens-fan img:nth-child(2) { margin-top: -4%; }
 .work:hover .screens-fan img { transform: translateY(-8px); }
 .work:hover .screens-fan img:nth-child(2) { transform: translateY(-14px); }
+/* visuels de présentation empilés : les suivants dépassent derrière le premier */
+.screens-deck { position: absolute; inset: 0; }
+.screens-deck img { position: absolute; left: 7%; top: 50%; width: 86%; height: auto; border-radius: 14px; box-shadow: 0 24px 48px rgba(40, 30, 140, .28); transform: translateY(-42%); transition: transform .6s var(--ease); }
+.screens-deck img:nth-last-child(2) { transform: translateY(-58%) scale(.92); }
+.screens-deck img:nth-last-child(3) { transform: translateY(-74%) scale(.84); }
+.work:hover .screens-deck img:last-child { transform: translateY(-44%); }
+.work:hover .screens-deck img:nth-last-child(2) { transform: translateY(-64%) scale(.92); }
+.work:hover .screens-deck img:nth-last-child(3) { transform: translateY(-84%) scale(.84); }
 .work-3d { position: absolute; left: 50%; top: 47%; width: 44%; height: auto; transform: translate(-50%, -50%); filter: drop-shadow(0 24px 30px rgba(0, 0, 0, .35)); transition: transform .7s var(--ease); }
 .work:hover .work-3d { transform: translate(-50%, -53%) rotate(-5deg) scale(1.07); }
 .shot { position: absolute; left: 12%; right: 8%; top: 12%; bottom: -10%; overflow: hidden; background: #fff; border-radius: 12px; box-shadow: 0 28px 56px rgba(0, 0, 0, .35); transition: transform .6s var(--ease); }
@@ -263,6 +271,8 @@ html:has(dialog[open]), html:has(.nav.is-open) { overflow: hidden; }
 .screens-track img { display: block; width: 100%; height: auto; }
 .screens-track h3 { margin-top: 12px; font-size: 21px; letter-spacing: -.03em; color: var(--on); }
 .screens-track p { font-size: 15px; line-height: 1.45; color: var(--on); opacity: .85; }
+.screens-track.wide { grid-auto-columns: min(900px, 86%); }
+.screens-track.wide button { border-radius: 16px; }
 .screens-track.single { grid-auto-columns: minmax(0, 1fr); }
 .screens-track.single img { max-height: 70vh; object-fit: contain; }
 .story { display: flex; flex-direction: column; gap: clamp(56px, 7vw, 112px); margin-top: clamp(64px, 8vw, 128px); }
@@ -415,6 +425,7 @@ html:has(dialog[open]), html:has(.nav.is-open) { overflow: hidden; }
   .work .shot-logo.is-app { width: 26%; }
   .work .screens-fan { left: 8%; right: 3%; top: 16%; }
   .work .screens-fan img { border-radius: 6px; }
+  .screens-deck img { border-radius: 8px; }
   .work-3d { width: 60%; }
   .work-hotspot, .work-sub { display: none; }
   .work-body { gap: 4px; }

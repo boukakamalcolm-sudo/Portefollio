@@ -37,9 +37,12 @@ export function projectMedia(project: Project) {
   const seed = project.visual === undefined ? seedFor(project) : undefined;
   const own = project.files.filter((f) => f.kind === 'image');
   const images = own.length ? own : (seed?.files.filter((f) => f.kind === 'image') ?? []);
+  const screens = images.filter((f) => !f.icon);
   return {
     icon: images.find((f) => f.icon)?.url,
-    screens: images.filter((f) => !f.icon),
+    screens,
+    // visuels de présentation en paysage plutôt qu'écrans de téléphone
+    wide: (screens[0]?.width ?? 0) > (screens[0]?.height ?? Infinity),
     color: project.color ?? seed?.color ?? '',
     status: project.status ?? seed?.status ?? '',
   };

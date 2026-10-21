@@ -7,6 +7,9 @@ export type ProjectFile = {
   caption?: string;
   // image servant d'icône de l'application (carte et en-tête de la page projet)
   icon?: boolean;
+  // dimensions en pixels : une image plus large que haute est présentée comme une capture paysage
+  width?: number;
+  height?: number;
 };
 
 export type Project = {

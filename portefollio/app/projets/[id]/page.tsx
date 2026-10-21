@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function PagerLink({ project, label, className }: { project: Project; label: string; className?: string }) {
   return (
     <a className={`pager-link ${className ?? ''}`} href={projectHref(project.id)}>
-      <Image src={visualSrc(project.visual)} alt="" width={64} height={64} />
+      <Image src={visualSrc(project)} alt="" width={64} height={64} />
       <span><span className="label">{label}</span><strong>{project.title}</strong></span>
     </a>
   );

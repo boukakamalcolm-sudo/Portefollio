@@ -16,7 +16,7 @@ export function ProjectVisual({ project, className, sizes, priority }: {
 }) {
   const img = project.files.find((f) => f.kind === 'image');
   if (img) return <Image src={img.url} alt="" fill sizes={sizes} className="work-photo" priority={priority} />;
-  return <Image src={visualSrc(project.visual)} alt="" width={640} height={640} sizes={sizes} className={className} priority={priority} />;
+  return <Image src={visualSrc(project)} alt="" width={640} height={640} sizes={sizes} className={className} priority={priority} />;
 }
 
 export default function ProjectCard({ project, index }: { project: Project; index: number }) {

@@ -27,7 +27,7 @@ export default function Site({ projects }: { projects: Project[] }) {
       <section className="panel" id="parcours" aria-labelledby="parcours-title">
         <header className="panel-head">
           <p className="label">Parcours</p>
-          <h2 id="parcours-title">Du SaaS au service public<span className="dot">.</span></h2>
+          <h2 id="parcours-title">De la relation client au pilotage SI<span className="dot">.</span></h2>
         </header>
         <div className="about">
           <div className="portrait">

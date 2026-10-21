@@ -169,10 +169,10 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
       <label>Outils (séparés par des virgules)<input value={stack} onChange={(e) => setStack(e.target.value)} placeholder="Jira, BPMN, Power Automate" /></label>
       <div className="editor-visual">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={visualSrc(p.visual)} alt="" width={56} height={56} />
+        <img src={visualSrc(p)} alt="" width={56} height={56} />
         <label>Objet 3D de couverture (si le projet n’a pas d’image)
           <select value={p.visual ?? ''} onChange={set('visual')}>
-            <option value="">Astérisque (par défaut)</option>
+            <option value="">Automatique (objet prévu pour ce projet, sinon astérisque)</option>
             {Object.entries(VISUALS).filter(([k]) => k !== 'asterisque').map(([k, label]) => <option key={k} value={k}>{label}</option>)}
           </select>
         </label>
@@ -329,7 +329,7 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
                 return (
                   <li key={p.id}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={cover ? cover.url : visualSrc(p.visual)} alt="" className={`admin-thumb${cover ? '' : ' is-3d'}`} />
+                    <img src={cover ? cover.url : visualSrc(p)} alt="" className={`admin-thumb${cover ? '' : ' is-3d'}`} />
                     <div className="admin-item">
                       <strong><a href={projectHref(p.id)} target="_blank" rel="noopener noreferrer">{p.title} ↗</a></strong>
                       <small>{p.sector || 'Sans contexte'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}</small>

@@ -2,14 +2,13 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Gallery from '@/components/Gallery';
-import { projectTone } from '@/components/ProjectCard';
+import { visualStyle } from '@/components/ProjectCard';
 import Shell from '@/components/Shell';
-import Shot from '@/components/Shot';
 import { CONTACT_EMAIL } from '@/lib/config';
 import { lines, pad, projectHref } from '@/lib/format';
 import { getProjects } from '@/lib/store';
 import type { Project } from '@/lib/types';
-import { coverFor, visualSrc } from '@/lib/visuals';
+import { projectMedia, visualSrc } from '@/lib/visuals';
 
 // Pages statiques, régénérées avec la page d'accueil quand un projet est enregistré
 export const revalidate = 3600;
@@ -36,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function PagerLink({ project, label, className }: { project: Project; label: string; className?: string }) {
   return (
     <a className={`pager-link ${className ?? ''}`} href={projectHref(project.id)}>
-      <Image src={visualSrc(project)} alt="" width={64} height={64} />
+      <Image src={projectMedia(project).icon ?? visualSrc(project)} alt="" width={64} height={64} />
       <span><span className="label">{label}</span><strong>{project.title}</strong></span>
     </a>
   );
@@ -52,71 +51,67 @@ export default async function ProjectPage({ params }: Props) {
   const prev = projects[index - 1];
   const next = projects[index + 1];
   const steps = lines(p.solution);
-  const cover = coverFor(p);
-  // la capture de couverture est déjà en tête de page
-  const images = p.files.filter((f) => f.kind === 'image' && f.url !== cover);
+  const media = projectMedia(p);
+  const bg = visualStyle(media.color, index);
+  const logo = media.icon ?? (media.screens.length ? visualSrc(p) : undefined);
   const pdfs = p.files.filter((f) => f.kind === 'pdf');
   const facts = [
     ['Rôle', p.role],
     ['Période', p.period],
-    ['Contexte', p.sector],
     ['Outils', p.stack?.join(', ')],
+    ['Statut', media.status],
   ].filter((f): f is [string, string] => !!f[1]);
 
   return (
     <Shell active="Projets">
       <p className="back"><a className="chip-link" href="/#projets">← Tous les projets</a></p>
 
-      <header className={`project-hero ${projectTone(index)}`}>
-        <div className="project-hero-text">
-          <p className="label">Projet {pad(index + 1)} / {pad(projects.length)}</p>
-          <h1>{p.title}</h1>
-          {p.subtitle && <p className="project-sub">{p.subtitle}</p>}
-          {p.tags.length > 0 && <ul className="bubbles">{p.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
-        </div>
-        <div className="project-visual">
-          {cover
-            ? <Shot src={cover} logo={visualSrc(p)} alt={`Capture de ${p.title}`} sizes="(max-width: 980px) 90vw, 32vw" priority />
-            : <Image className="project-3d" src={visualSrc(p)} alt="" width={640} height={640} sizes="(max-width: 980px) 50vw, 24vw" priority />}
-        </div>
-      </header>
-
-      {facts.length > 0 && (
-        <dl className="panel facts">
-          {facts.map(([k, v]) => <div key={k}><dt className="label">{k}</dt><dd>{v}</dd></div>)}
-        </dl>
-      )}
-
-      <div className="panel story">
-        {p.problem && (
-          <section>
-            <h2>Contexte</h2>
-            <p className="prose">{p.problem}</p>
-          </section>
+      <article className="panel sheet">
+        {/* sans écran, l'objet 3D est déjà en grand dans la bande : pas de doublon dans l'en-tête */}
+        <header className={`sheet-head${logo ? '' : ' no-logo'}`}>
+          {logo && <Image className={`sheet-logo${media.icon ? ' is-app' : ''}`} src={logo} alt="" width={160} height={160} priority />}
+          <div>
+            <p className="label">Projet {pad(index + 1)} / {pad(projects.length)} · {p.sector}</p>
+            <h1>{p.title}</h1>
+            {p.subtitle && <p className="sheet-sub">{p.subtitle}</p>}
+          </div>
+        </header>
+        {(facts.length > 0 || p.tags.length > 0) && (
+          <div className="sheet-meta">
+            {facts.length > 0 && <dl className="sheet-facts">{facts.map(([k, v]) => <div key={k}><dt className="label">{k}</dt><dd>{v}</dd></div>)}</dl>}
+            {p.tags.length > 0 && <ul className="bubbles">{p.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
+          </div>
         )}
-        {steps.length > 0 && (
-          <section>
-            <h2>Ce que j’ai fait</h2>
-            {steps.length > 1
-              ? <ol className="steps">{steps.map((s) => <li key={s}>{s}</li>)}</ol>
-              : <p className="prose">{steps[0]}</p>}
-          </section>
-        )}
-      </div>
 
-      {p.result && (
-        <section className="panel result">
-          <p className="label accent">Résultat</p>
-          <p>{p.result}</p>
+        <section className={`sheet-band ${bg.className}`} style={bg.style}>
+          {media.screens.length > 0
+            ? <Gallery screens={media.screens} title={p.title} />
+            : <Image className="sheet-3d" src={visualSrc(p)} alt="" width={640} height={640} sizes="(max-width: 980px) 50vw, 22vw" priority />}
         </section>
-      )}
 
-      {images.length > 0 && (
-        <section className="panel">
-          <h2 className="label">Captures</h2>
-          <Gallery images={images} title={p.title} />
-        </section>
-      )}
+        <div className="sheet-story">
+          {p.problem && (
+            <section>
+              <h2>Le problème</h2>
+              <p className="prose">{p.problem}</p>
+            </section>
+          )}
+          {steps.length > 0 && (
+            <section>
+              <h2>Ce que j’ai fait</h2>
+              {steps.length > 1
+                ? <ol className="steps">{steps.map((s) => <li key={s}>{s}</li>)}</ol>
+                : <p className="prose">{steps[0]}</p>}
+            </section>
+          )}
+          {p.result && (
+            <section className="sheet-result">
+              <h2>Résultat</h2>
+              <p className="prose">{p.result}</p>
+            </section>
+          )}
+        </div>
+      </article>
 
       {pdfs.length > 0 && (
         <section className="panel">

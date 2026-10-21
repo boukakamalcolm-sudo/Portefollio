@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Project, ProjectFile } from '@/lib/types';
 import { projectHref } from '@/lib/format';
-import { VISUALS, visualSrc } from '@/lib/visuals';
+import { projectMedia, VISUALS, visualSrc } from '@/lib/visuals';
 
 const empty = (): Project => ({
   id: '',
@@ -126,6 +126,14 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
     if (fileInput.current) fileInput.current.value = '';
   }
 
+  // une seule icône : cocher une image décoche les autres
+  function updateFile(i: number, patch: Partial<ProjectFile>) {
+    setP((cur) => ({
+      ...cur,
+      files: cur.files.map((f, j) => (j === i ? { ...f, ...patch } : patch.icon ? { ...f, icon: false } : f)),
+    }));
+  }
+
   function moveFile(i: number, dir: -1 | 1) {
     const files = [...p.files];
     const j = i + dir;
@@ -165,6 +173,15 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
         <label>Mon rôle<input value={p.role ?? ''} onChange={set('role')} placeholder="Chef de projet SI" /></label>
         <label>Période<input value={p.period ?? ''} onChange={set('period')} placeholder="2025 – 2026" /></label>
       </div>
+      <div className="editor-row">
+        <label>Statut<input value={p.status ?? ''} onChange={set('status')} placeholder="En production" /></label>
+        <label>Couleur des écrans (celle de l’application)
+          <span className="editor-color">
+            <input type="color" value={p.color || '#eeede8'} onChange={set('color')} aria-label="Choisir la couleur" />
+            <input value={p.color ?? ''} onChange={set('color')} placeholder="#d6d4fc" maxLength={7} />
+          </span>
+        </label>
+      </div>
       <label>Tags (séparés par des virgules)<input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="CADRAGE, DONNÉES, DÉPLOIEMENT" /></label>
       <label>Outils (séparés par des virgules)<input value={stack} onChange={(e) => setStack(e.target.value)} placeholder="Jira, BPMN, Power Automate" /></label>
       <div className="editor-visual">
@@ -177,22 +194,38 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
           </select>
         </label>
       </div>
-      <label>Contexte<textarea rows={4} value={p.problem} onChange={set('problem')} /></label>
+      <label>Le problème<textarea rows={4} value={p.problem} onChange={set('problem')} /></label>
       <label>Ce que j’ai fait (une action par ligne)<textarea rows={6} value={p.solution} onChange={set('solution')} /></label>
       <label>Résultat<textarea rows={3} value={p.result} onChange={set('result')} /></label>
 
       <div className="files">
-        <span className="files-title">Fichiers (images et PDF, 4 Mo max ; les photos sont réduites automatiquement). La 1re image sert de couverture.</span>
+        <span className="files-title">
+          Fichiers (images et PDF, 4 Mo max ; les photos sont réduites automatiquement). Les trois premiers écrans
+          apparaissent sur la carte ; le titre et l’explication de chaque écran s’affichent dessous, sur la page projet.
+        </span>
         {p.files.map((f, i) => (
-          <div className="file-row" key={f.url}>
-            {f.kind === 'image'
-              // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={f.url} alt="" />
-              : <span className="file-pdf">PDF</span>}
-            <a href={f.url} target="_blank" rel="noopener noreferrer">{f.name}</a>
-            <button type="button" onClick={() => moveFile(i, -1)} aria-label="Monter">↑</button>
-            <button type="button" onClick={() => moveFile(i, 1)} aria-label="Descendre">↓</button>
-            <button type="button" className="danger" onClick={() => setP({ ...p, files: p.files.filter((x) => x.url !== f.url) })} aria-label="Retirer">✕</button>
+          <div className="file-item" key={f.url}>
+            <div className="file-row">
+              {f.kind === 'image'
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={f.url} alt="" />
+                : <span className="file-pdf">PDF</span>}
+              <a href={f.url} target="_blank" rel="noopener noreferrer">{f.name}</a>
+              <button type="button" onClick={() => moveFile(i, -1)} aria-label="Monter">↑</button>
+              <button type="button" onClick={() => moveFile(i, 1)} aria-label="Descendre">↓</button>
+              <button type="button" className="danger" onClick={() => setP({ ...p, files: p.files.filter((x) => x.url !== f.url) })} aria-label="Retirer">✕</button>
+            </div>
+            {f.kind === 'image' && (
+              <div className="file-meta">
+                <label className="file-icon"><input type="checkbox" checked={!!f.icon} onChange={(e) => updateFile(i, { icon: e.target.checked })} /> Icône de l’application</label>
+                {!f.icon && (
+                  <>
+                    <input value={f.title ?? ''} onChange={(e) => updateFile(i, { title: e.target.value })} placeholder="Titre de l’écran (ex. Ventes)" aria-label="Titre de l’écran" maxLength={80} />
+                    <input value={f.caption ?? ''} onChange={(e) => updateFile(i, { caption: e.target.value })} placeholder="Explication (ex. Suivre les ventes en temps réel)" aria-label="Explication de l’écran" maxLength={300} />
+                  </>
+                )}
+              </div>
+            )}
           </div>
         ))}
         <input
@@ -325,11 +358,12 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
             {error && <p className="form-error" role="alert">{error}</p>}
             <ul className="admin-list">
               {projects.map((p, i) => {
-                const cover = p.files.find((f) => f.kind === 'image');
+                const media = projectMedia(p);
+                const cover = media.icon ?? media.screens[0]?.url;
                 return (
                   <li key={p.id}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={cover ? cover.url : visualSrc(p)} alt="" className={`admin-thumb${cover ? '' : ' is-3d'}`} />
+                    <img src={cover ?? visualSrc(p)} alt="" className={`admin-thumb${cover ? '' : ' is-3d'}`} />
                     <div className="admin-item">
                       <strong><a href={projectHref(p.id)} target="_blank" rel="noopener noreferrer">{p.title} ↗</a></strong>
                       <small>{p.sector || 'Sans contexte'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}</small>

@@ -30,10 +30,17 @@ export function visualSrc(project: Pick<Project, 'id' | 'title' | 'visual'>) {
   return `/3d/${v}.png`;
 }
 
-// Capture de l'application : 1re image du projet. Pour un projet enregistré avant les captures
-// (sans champ visual), celle du contenu de départ ; une fois le projet enregistré depuis l'admin,
-// ses propres fichiers font foi, même vides.
-export function coverFor(project: Pick<Project, 'id' | 'title' | 'files' | 'visual'>) {
-  const first = (p?: Pick<Project, 'files'>) => p?.files.find((f) => f.kind === 'image')?.url;
-  return first(project) ?? (project.visual === undefined ? first(seedFor(project)) : undefined);
+// Visuels d'un projet : icône de l'application, écrans, couleur et statut.
+// Un projet enregistré avant ces champs (sans champ visual) reprend ceux du contenu de départ tant
+// qu'il n'a pas d'image ; une fois enregistré depuis l'admin, ses propres données font foi, même vides.
+export function projectMedia(project: Project) {
+  const seed = project.visual === undefined ? seedFor(project) : undefined;
+  const own = project.files.filter((f) => f.kind === 'image');
+  const images = own.length ? own : (seed?.files.filter((f) => f.kind === 'image') ?? []);
+  return {
+    icon: images.find((f) => f.icon)?.url,
+    screens: images.filter((f) => !f.icon),
+    color: project.color ?? seed?.color ?? '',
+    status: project.status ?? seed?.status ?? '',
+  };
 }

@@ -3,6 +3,7 @@ import { isAdmin } from '@/lib/auth';
 import { blobReady, getProjects, saveProjects, deleteFiles } from '@/lib/store';
 import { seedProjects } from '@/lib/seed';
 import type { Project } from '@/lib/types';
+import { isVisual } from '@/lib/visuals';
 
 // fichiers servis par /api/file (Blob privé), ou anciennes URL publiques Vercel Blob
 const FILE_URL = /^(\/api\/file\/projets\/[\w.\-]+|https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/.+)$/i;
@@ -23,6 +24,7 @@ function clean(input: Partial<Project>): Project {
     period: str(input.period, 60),
     tags: strs(input.tags, 8),
     stack: strs(input.stack, 12),
+    visual: isVisual(input.visual) ? input.visual : '',
     problem: str(input.problem),
     solution: str(input.solution),
     result: str(input.result),

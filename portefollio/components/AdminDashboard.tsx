@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Project, ProjectFile } from '@/lib/types';
 import { projectHref } from '@/lib/format';
+import { VISUALS, visualSrc } from '@/lib/visuals';
 
 const empty = (): Project => ({
   id: '',
@@ -13,6 +14,7 @@ const empty = (): Project => ({
   period: '',
   tags: [],
   stack: [],
+  visual: '',
   problem: '',
   solution: '',
   result: '',
@@ -91,7 +93,7 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
   const [error, setError] = useState('');
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const set = (k: keyof Project) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const set = (k: keyof Project) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setP({ ...p, [k]: e.target.value });
 
   async function addFiles(list: FileList | null) {
@@ -165,6 +167,16 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
       </div>
       <label>Tags (séparés par des virgules)<input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="CADRAGE, DONNÉES, DÉPLOIEMENT" /></label>
       <label>Outils (séparés par des virgules)<input value={stack} onChange={(e) => setStack(e.target.value)} placeholder="Jira, BPMN, Power Automate" /></label>
+      <div className="editor-visual">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={visualSrc(p.visual)} alt="" width={56} height={56} />
+        <label>Objet 3D de couverture (si le projet n’a pas d’image)
+          <select value={p.visual ?? ''} onChange={set('visual')}>
+            <option value="">Astérisque (par défaut)</option>
+            {Object.entries(VISUALS).filter(([k]) => k !== 'asterisque').map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+          </select>
+        </label>
+      </div>
       <label>Contexte<textarea rows={4} value={p.problem} onChange={set('problem')} /></label>
       <label>Ce que j’ai fait (une action par ligne)<textarea rows={6} value={p.solution} onChange={set('solution')} /></label>
       <label>Résultat<textarea rows={3} value={p.result} onChange={set('result')} /></label>
@@ -316,10 +328,8 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
                 const cover = p.files.find((f) => f.kind === 'image');
                 return (
                   <li key={p.id}>
-                    {cover
-                      // eslint-disable-next-line @next/next/no-img-element
-                      ? <img src={cover.url} alt="" className="admin-thumb" />
-                      : <span className="admin-thumb empty">{String(i + 1).padStart(2, '0')}</span>}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={cover ? cover.url : visualSrc(p.visual)} alt="" className={`admin-thumb${cover ? '' : ' is-3d'}`} />
                     <div className="admin-item">
                       <strong><a href={projectHref(p.id)} target="_blank" rel="noopener noreferrer">{p.title} ↗</a></strong>
                       <small>{p.sector || 'Sans contexte'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}</small>

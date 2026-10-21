@@ -1,41 +1,36 @@
 import Image from 'next/image';
 import type { Project } from '@/lib/types';
 import { pad, projectHref } from '@/lib/format';
+import { visualSrc } from '@/lib/visuals';
 
-const TONES = ['stone', 'ink', 'accent'];
+const TONES = ['light', 'ink', 'peach'];
 
-// Couverture : la 1re image du projet, sinon une couverture typographique (numéro + outils)
-export function ProjectVisual({ project, index, sizes }: { project: Project; index: number; sizes: string }) {
+export const projectTone = (index: number) => TONES[index % TONES.length];
+
+// Couverture : la 1re image du projet, sinon son objet 3D
+export function ProjectVisual({ project, className, sizes, priority }: {
+  project: Project;
+  className: string;
+  sizes: string;
+  priority?: boolean;
+}) {
   const img = project.files.find((f) => f.kind === 'image');
-  const words = project.stack?.length ? project.stack : project.tags;
-  return (
-    <div className={`visual ${TONES[index % TONES.length]}`}>
-      {img ? (
-        <Image src={img.url} alt="" fill sizes={sizes} className="visual-img" draggable={false} />
-      ) : (
-        <div className="visual-type" aria-hidden="true">
-          <span className="visual-num">{pad(index + 1)}</span>
-          <span className="visual-stack">{words.slice(0, 4).join(' · ')}</span>
-        </div>
-      )}
-    </div>
-  );
+  if (img) return <Image src={img.url} alt="" fill sizes={sizes} className="work-photo" priority={priority} />;
+  return <Image src={visualSrc(project.visual)} alt="" width={640} height={640} sizes={sizes} className={className} priority={priority} />;
 }
 
 export default function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const meta = [project.role, project.period].filter(Boolean).join(' · ');
+  const hasPhoto = project.files.some((f) => f.kind === 'image');
   return (
-    <article className="card">
-      <ProjectVisual project={project} index={index} sizes="(max-width: 640px) 90vw, (max-width: 1060px) 45vw, 30vw" />
-      <div className="card-body">
-        <p className="label">{project.sector}</p>
+    <article className={`work ${hasPhoto ? 'photo' : projectTone(index)}`}>
+      <ProjectVisual project={project} className="work-3d" sizes="(max-width: 900px) 30vw, 18vw" priority={index < 2} />
+      <p className="work-top"><span>{pad(index + 1)}</span><span className="work-sector">{project.sector}</span></p>
+      <div className="work-bottom">
         <h3>
           {/* le lien couvre toute la carte (voir .card-link::after) */}
           <a className="card-link" href={projectHref(project.id)}>{project.title}</a>
         </h3>
-        {project.subtitle && <p className="card-sub">{project.subtitle}</p>}
-        {meta && <p className="card-meta">{meta}</p>}
-        <span className="card-more" aria-hidden="true">Voir le projet →</span>
+        <span className="work-more" aria-hidden="true">Voir le projet →</span>
       </div>
     </article>
   );

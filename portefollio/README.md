@@ -31,6 +31,8 @@ Sur Vercel, le « Root Directory » du projet doit être `portefollio`.
 - `LEGAL` : statut, SIRET et adresse, affichés dans `/mentions-legales`
 - `LINKEDIN_URL`, `BOOKING_URL` (Calendly, Cal.com…) : les liens apparaissent dès qu'ils sont remplis
 - `CV_URL` : déposer le CV dans `public/` et indiquer son chemin pour afficher « Télécharger le CV »
+- Objets 3D de couverture : `public/3d/` (générés avec Canva, design « Portfolio – éléments 3D (export) »),
+  liste dans `lib/visuals.ts`, choix par projet dans l'admin
 - Parcours, compétences et chiffres clés : `lib/profile.ts`
 
 ## Local

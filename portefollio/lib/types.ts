@@ -19,4 +19,6 @@ export type Project = {
   role?: string;
   period?: string;
   stack?: string[];
+  // objet 3D de couverture (clé de lib/visuals.ts), utilisé quand le projet n'a pas d'image
+  visual?: string;
 };

@@ -6,10 +6,10 @@ import { useEffect, useState } from 'react';
 const LINKS = [
   ['/#projets', 'Projets'],
   ['/#parcours', 'Parcours'],
-  ['/#competences', 'Compétences'],
+  ['/#contact', 'Contact'],
 ] as const;
 
-export default function Nav() {
+export default function Nav({ active }: { active?: string }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -24,11 +24,18 @@ export default function Nav() {
       <a className="skip" href="#contenu">Aller au contenu</a>
       <a className="brand" href="/" aria-label="Malcolm Boukaka-Massengo, accueil">MB<span>.</span></a>
       <nav id="menu" className={`nav-links${open ? ' open' : ''}`} aria-label="Navigation principale" onClick={() => setOpen(false)}>
-        {LINKS.map(([href, label]) => <a key={href} href={href}>{label}</a>)}
-        <a className="nav-cta" href="/#contact">Contact</a>
+        {LINKS.map(([href, label]) => (
+          <a key={href} href={href} className={active === label ? 'is-active' : undefined}>{label}</a>
+        ))}
       </nav>
-      <button className="nav-toggle" aria-expanded={open} aria-controls="menu" onClick={() => setOpen(!open)}>
-        {open ? 'Fermer' : 'Menu'}
+      <button
+        className={`nav-toggle${open ? ' open' : ''}`}
+        aria-expanded={open}
+        aria-controls="menu"
+        aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+        onClick={() => setOpen(!open)}
+      >
+        <span /><span />
       </button>
     </header>
   );

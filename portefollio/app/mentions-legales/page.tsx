@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import Footer from '@/components/Footer';
-import Nav from '@/components/Nav';
+import Shell from '@/components/Shell';
 import { CONTACT_EMAIL, LEGAL, LEGAL_NAME } from '@/lib/config';
 
 export const metadata: Metadata = {
@@ -10,9 +9,8 @@ export const metadata: Metadata = {
 
 export default function MentionsLegales() {
   return (
-    <>
-      <Nav />
-      <main id="contenu" className="legal">
+    <Shell>
+      <article className="panel legal">
         <h1>Mentions légales</h1>
 
         <h2>Éditeur du site</h2>
@@ -36,12 +34,12 @@ export default function MentionsLegales() {
         <h2>Propriété intellectuelle</h2>
         <p>
           Les textes, visuels et captures présentés sur ce site sont la propriété de leur auteur ou de ses clients, qui
-          en ont autorisé la diffusion. Toute reproduction sans autorisation est interdite.
+          en ont autorisé la diffusion. Toute reproduction sans autorisation est interdite. Les illustrations 3D ont été
+          créées avec Canva.
         </p>
 
         <p className="legal-back"><a href="/">← Retour au site</a></p>
-      </main>
-      <Footer />
-    </>
+      </article>
+    </Shell>
   );
 }

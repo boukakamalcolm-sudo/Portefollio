@@ -5,6 +5,7 @@ import type { Project } from './types';
 export const seedProjects: Project[] = [
   {
     id: 'indicateurs-musees',
+    visual: 'musee',
     title: 'Indicateurs des musées',
     subtitle: 'Un outil de remontée d’indicateurs cadré et déployé auprès d’une cinquantaine de musées',
     sector: 'Ministère de la Culture · Hauts-de-France',
@@ -26,6 +27,7 @@ export const seedProjects: Project[] = [
   },
   {
     id: 'ia-generative-covea',
+    visual: 'ia',
     title: 'IA générative & assistant RAG',
     subtitle: 'Des cas d’usage à un assistant IA branché sur les connaissances internes',
     sector: 'Covéa · Assurance',
@@ -48,6 +50,7 @@ export const seedProjects: Project[] = [
   },
   {
     id: 'marche-ya-cina',
+    visual: 'panier',
     title: 'Marché ya Cina',
     subtitle: 'Une application de gestion de stock et de caisse, conçue et construite avec l’IA',
     sector: 'Projet personnel · Commerce alimentaire, Brazzaville',
@@ -68,6 +71,7 @@ export const seedProjects: Project[] = [
   },
   {
     id: 'cartographie-si',
+    visual: 'carte',
     title: 'Cartographie des outils',
     subtitle: 'Y voir clair dans les applications et les processus de 18 directions régionales',
     sector: 'Ministère de la Culture · Service du numérique',
@@ -87,6 +91,7 @@ export const seedProjects: Project[] = [
   },
   {
     id: 'ged-salesforce',
+    visual: 'dossier',
     title: 'GED × Salesforce',
     subtitle: 'Intégrer la gestion documentaire à Salesforce Service Cloud par API REST',
     sector: 'Covéa · Assurance',
@@ -103,6 +108,7 @@ export const seedProjects: Project[] = [
   },
   {
     id: 'crm-saas-beekast',
+    visual: 'engrenages',
     title: 'CRM automatisé & backlog produit',
     subtitle: 'Workflows Zoho, tableaux de bord SQL et besoins clients traduits en évolutions produit',
     sector: 'Beekast · Éditeur SaaS',

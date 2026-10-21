@@ -2,13 +2,14 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Gallery from '@/components/Gallery';
-import { projectTone, ProjectVisual } from '@/components/ProjectCard';
+import { projectTone } from '@/components/ProjectCard';
 import Shell from '@/components/Shell';
+import Shot from '@/components/Shot';
 import { CONTACT_EMAIL } from '@/lib/config';
 import { lines, pad, projectHref } from '@/lib/format';
 import { getProjects } from '@/lib/store';
 import type { Project } from '@/lib/types';
-import { visualSrc } from '@/lib/visuals';
+import { coverFor, visualSrc } from '@/lib/visuals';
 
 // Pages statiques, régénérées avec la page d'accueil quand un projet est enregistré
 export const revalidate = 3600;
@@ -51,7 +52,9 @@ export default async function ProjectPage({ params }: Props) {
   const prev = projects[index - 1];
   const next = projects[index + 1];
   const steps = lines(p.solution);
-  const images = p.files.filter((f) => f.kind === 'image');
+  const cover = coverFor(p);
+  // la capture de couverture est déjà en tête de page
+  const images = p.files.filter((f) => f.kind === 'image' && f.url !== cover);
   const pdfs = p.files.filter((f) => f.kind === 'pdf');
   const facts = [
     ['Rôle', p.role],
@@ -64,14 +67,18 @@ export default async function ProjectPage({ params }: Props) {
     <Shell active="Projets">
       <p className="back"><a className="chip-link" href="/#projets">← Tous les projets</a></p>
 
-      <header className={`project-hero ${images.length ? 'photo' : projectTone(index)}`}>
+      <header className={`project-hero ${projectTone(index)}`}>
         <div className="project-hero-text">
           <p className="label">Projet {pad(index + 1)} / {pad(projects.length)}</p>
           <h1>{p.title}</h1>
           {p.subtitle && <p className="project-sub">{p.subtitle}</p>}
-          {p.tags.length > 0 && <ul className="tags">{p.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
+          {p.tags.length > 0 && <ul className="bubbles">{p.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
         </div>
-        <ProjectVisual project={p} className="project-3d" sizes="(max-width: 900px) 50vw, 24vw" priority />
+        <div className="project-visual">
+          {cover
+            ? <Shot src={cover} logo={visualSrc(p)} alt={`Capture de ${p.title}`} sizes="(max-width: 980px) 90vw, 32vw" priority />
+            : <Image className="project-3d" src={visualSrc(p)} alt="" width={640} height={640} sizes="(max-width: 980px) 50vw, 24vw" priority />}
+        </div>
       </header>
 
       {facts.length > 0 && (

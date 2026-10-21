@@ -71,5 +71,7 @@ export async function readFile(pathname: string) {
 }
 
 export async function deleteFiles(urls: string[]) {
-  if (urls.length) await del(urls.map(toPathname)).catch(() => {});
+  // les captures livrées avec le site (public/captures) ne sont pas dans le Blob store
+  const blobs = urls.filter((u) => !u.startsWith('/captures/'));
+  if (blobs.length) await del(blobs.map(toPathname)).catch(() => {});
 }

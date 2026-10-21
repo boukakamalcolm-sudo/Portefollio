@@ -5,8 +5,9 @@ import { seedProjects } from '@/lib/seed';
 import type { Project } from '@/lib/types';
 import { isVisual } from '@/lib/visuals';
 
-// fichiers servis par /api/file (Blob privé), ou anciennes URL publiques Vercel Blob
-const FILE_URL = /^(\/api\/file\/projets\/[\w.\-]+|https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/.+)$/i;
+// fichiers servis par /api/file (Blob privé), captures livrées avec le site (public/captures),
+// ou anciennes URL publiques Vercel Blob
+const FILE_URL = /^(\/api\/file\/projets\/[\w.\-]+|\/captures\/[\w.\-]+|https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/.+)$/i;
 const readJson = (req: Request) => req.json().catch(() => null);
 const str = (v: unknown, max = 4000) => (typeof v === 'string' ? v.slice(0, max).trim() : '');
 const strs = (v: unknown, count: number) => (Array.isArray(v) ? v.map((t) => str(t, 40)).filter(Boolean).slice(0, count) : []);
@@ -68,7 +69,7 @@ export async function PUT(req: Request) {
 }
 
 // Importer le contenu de départ (lib/seed.ts) : chaque projet est reconnu par son identifiant ou son titre.
-// Les textes sont remplacés, les images et PDF déjà envoyés sont conservés.
+// Les textes sont remplacés, les images et PDF déjà envoyés sont conservés (sinon ceux du contenu de départ).
 // Les projets importés passent en tête, dans l'ordre du contenu de départ ; les autres suivent, inchangés.
 export async function POST() {
   if (!(await isAdmin())) return deny();
@@ -80,7 +81,7 @@ export async function POST() {
     const match = free.find((p) => p.id === seed.id) ?? free.find((p) => norm(p.title) === norm(seed.title));
     if (!match) return seed;
     used.add(match.id);
-    return { ...seed, id: match.id, files: match.files };
+    return { ...seed, id: match.id, files: match.files.length ? match.files : seed.files };
   });
   const next = [...imported, ...current.filter((p) => !used.has(p.id))];
   await saveProjects(next);

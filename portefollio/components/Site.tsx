@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import type { Project } from '@/lib/types';
 import { AVAILABILITY, BOOKING_URL, CONTACT_EMAIL, CV_URL, LINKEDIN_URL, LOCATION } from '@/lib/config';
-import { ABOUT, EDUCATION, FIGURES, LANGUAGES, METHOD, SKILLS, XP } from '@/lib/profile';
+import { ABOUT, EDUCATION, LANGUAGES, METHOD, XP } from '@/lib/profile';
 import { pad, projectHref } from '@/lib/format';
+import Experience from './Experience';
 import ProjectCard from './ProjectCard';
 import Shell from './Shell';
 
@@ -10,6 +11,14 @@ const external = { target: '_blank', rel: 'noopener noreferrer' } as const;
 
 export default function Site({ projects }: { projects: Project[] }) {
   const byId = new Map(projects.map((p) => [p.id, p]));
+  const xp = XP.map((x) => ({
+    ...x,
+    logo: `/3d/${x.visual}.png`,
+    related: x.projects
+      .map((id) => byId.get(id))
+      .filter((p): p is Project => !!p)
+      .map((p) => ({ title: p.title, href: projectHref(p.id) })),
+  }));
 
   return (
     <Shell home active="Projets">
@@ -31,62 +40,17 @@ export default function Site({ projects }: { projects: Project[] }) {
         </header>
         <div className="about">
           <div className="portrait">
-            <Image src="/malcolm.jpg" alt="Portrait de Malcolm Boukaka-Massengo" width={552} height={552} sizes="(max-width: 900px) 140px, 180px" />
+            <Image src="/malcolm.jpg" alt="Portrait de Malcolm Boukaka-Massengo" width={552} height={552} sizes="(max-width: 980px) 120px, 160px" />
           </div>
-          <p className="about-intro">{ABOUT}</p>
-        </div>
-        <ul className="figures" aria-label="Quelques repères">
-          {FIGURES.map(([n, text]) => <li key={text}><strong>{n}</strong><span>{text}</span></li>)}
-        </ul>
-        <ol className="xp">
-          {XP.map((x) => {
-            const related = x.projects.map((id) => byId.get(id)).filter((p): p is Project => !!p);
-            return (
-              <li key={x.org}>
-                <p className="label">{x.period}</p>
-                <div>
-                  <h3>{x.role}</h3>
-                  <p className="xp-org">{x.org}</p>
-                  <p className="xp-text">{x.text}</p>
-                  {related.length > 0 && (
-                    <p className="xp-links">
-                      {related.map((p) => <a key={p.id} className="link" href={projectHref(p.id)}>{p.title} →</a>)}
-                    </p>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-        <div className="edu">
-          <h3 className="label">Formation</h3>
-          <ul>
-            {EDUCATION.map(([year, degree, school]) => (
-              <li key={degree}><span className="label">{year}</span><span><strong>{degree}</strong>{school}</span></li>
-            ))}
-          </ul>
-          <p><span className="label">Langues</span> {LANGUAGES}</p>
-        </div>
-      </section>
-
-      <section className="panel" id="competences" aria-labelledby="competences-title">
-        <header className="panel-head">
-          <p className="label">Compétences</p>
-          <h2 id="competences-title">Ma façon de travailler<span className="dot">.</span></h2>
-        </header>
-        <ol className="method">
-          {METHOD.map(([step, text], i) => (
-            <li key={step}><span className="label accent">{pad(i + 1)}</span><strong>{step}</strong><span>{text}</span></li>
-          ))}
-        </ol>
-        <div className="skills">
-          {SKILLS.map((s) => (
-            <div key={s.title}>
-              <h3>{s.title}</h3>
-              <ul className="chips">{s.items.map((it) => <li key={it}>{it}</li>)}</ul>
+          <div>
+            <p className="about-intro">{ABOUT}</p>
+            <div className="method-line">
+              <span className="label">Ma façon de travailler</span>
+              <ol>{METHOD.map((m, i) => <li key={m}><span>{pad(i + 1)}</span>{m}</li>)}</ol>
             </div>
-          ))}
+          </div>
         </div>
+        <Experience items={xp} education={EDUCATION} languages={LANGUAGES} />
       </section>
 
       <section className="panel dark contact" id="contact" aria-labelledby="contact-title">

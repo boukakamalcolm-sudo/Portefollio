@@ -2,9 +2,9 @@ import Image from 'next/image';
 import type { Project } from '@/lib/types';
 import { LINKEDIN_URL, LOCATION } from '@/lib/config';
 import { lines } from '@/lib/format';
-import { BUILDS, FREELANCE_ABOUT, FREELANCE_CASE, FREELANCE_EMAIL, FREELANCE_METHOD, FREELANCE_NAME, FREELANCE_PITCH, FREELANCE_ROLE } from '@/lib/freelance';
-import { projectMedia, seedFor } from '@/lib/visuals';
-import Gallery from './Gallery';
+import { BUILDS, FREELANCE_ABOUT, FREELANCE_EMAIL, FREELANCE_METHOD, FREELANCE_NAME, FREELANCE_PITCH, FREELANCE_ROLE } from '@/lib/freelance';
+import { onFreelance, projectMedia, visualSrc } from '@/lib/visuals';
+import Cases, { type Case } from './Cases';
 import Method from './Method';
 import QuoteForm from './QuoteForm';
 import { visualStyle } from './ProjectCard';
@@ -15,17 +15,29 @@ const NAV = {
   home: '#contenu',
   links: [
     ['#construire', 'Ce que je fais'],
-    ['#realisation', 'Réalisation'],
+    ['#realisation', 'Réalisations'],
     ['#methode', 'Méthode'],
   ],
   cta: ['#devis', 'Demander un devis'],
 } as const;
 
 export default function Freelance({ projects }: { projects: Project[] }) {
-  const featured = projects.find((p) => p.id === FREELANCE_CASE || seedFor(p)?.id === FREELANCE_CASE);
-  const media = featured && projectMedia(featured);
-  const bg = visualStyle(media?.color ?? '', 0);
-  const steps = featured ? lines(featured.solution) : [];
+  // projets cochés « page freelance » dans l'admin, dans l'ordre du portfolio
+  const cases: Case[] = projects.filter(onFreelance).map((p, i) => {
+    const media = projectMedia(p);
+    return {
+      id: p.id,
+      title: p.title,
+      subtitle: p.subtitle,
+      status: media.status,
+      icon: media.icon ?? visualSrc(p),
+      screens: media.screens,
+      bg: visualStyle(media.color, i),
+      problem: p.problem,
+      steps: lines(p.solution),
+      result: p.result,
+    };
+  });
 
   return (
     <Shell nav={NAV} owner={FREELANCE_NAME} email={FREELANCE_EMAIL}>
@@ -40,7 +52,7 @@ export default function Freelance({ projects }: { projects: Project[] }) {
         <p className="hero-role">{FREELANCE_PITCH}</p>
         <div className="actions hero-actions">
           <a className="btn pill" href="#devis">Demander un devis <span aria-hidden="true">→</span></a>
-          {featured && <a className="btn pill ghost" href="#realisation">Voir une réalisation</a>}
+          {cases.length > 0 && <a className="btn pill ghost" href="#realisation">Voir une réalisation</a>}
         </div>
       </section>
 
@@ -59,29 +71,7 @@ export default function Freelance({ projects }: { projects: Project[] }) {
         </ul>
       </section>
 
-      {featured && media && (
-        <section className="section" id="realisation" aria-labelledby="realisation-title">
-          <header className="section-head reveal">
-            <h2 id="realisation-title" className="title">{featured.title}.<span> {featured.subtitle}</span></h2>
-            {media.status && <p className="label section-count">{media.status}</p>}
-          </header>
-          <div className={`stage ${bg.className}`} style={bg.style}>
-            {media.screens.length > 0
-              ? <Gallery screens={media.screens} title={featured.title} />
-              : <Image className="stage-3d" src="/3d/panier.png" alt="" width={640} height={640} sizes="360px" />}
-          </div>
-          <div className="case-story">
-            {featured.problem && <section className="reveal"><h3 className="label">Le besoin</h3><p>{featured.problem}</p></section>}
-            {steps.length > 0 && (
-              <section className="reveal">
-                <h3 className="label">Ce que j’ai construit</h3>
-                <ol className="steps">{steps.map((s) => <li key={s}>{s}</li>)}</ol>
-              </section>
-            )}
-            {featured.result && <section className="reveal"><h3 className="label">Le résultat</h3><p>{featured.result}</p></section>}
-          </div>
-        </section>
-      )}
+      {cases.length > 0 && <Cases cases={cases} />}
 
       <Method title="Comment on travaille ensemble" texts={FREELANCE_METHOD} />
 

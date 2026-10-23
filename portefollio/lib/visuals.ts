@@ -24,6 +24,9 @@ const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCa
 export const seedFor = (project: Pick<Project, 'id' | 'title'>) =>
   seedProjects.find((s) => s.id === project.id || norm(s.title) === norm(project.title));
 
+// Réalisation montrée sur la page freelance : case cochée dans l'admin, sinon contenu de départ
+export const onFreelance = (project: Project) => project.freelance ?? seedFor(project)?.freelance ?? false;
+
 // Objet choisi dans l'admin ; sinon celui du contenu de départ ; sinon l'astérisque, objet neutre.
 export function visualSrc(project: Pick<Project, 'id' | 'title' | 'visual'>) {
   const v = [project.visual, seedFor(project)?.visual].find(isVisual) ?? 'asterisque';

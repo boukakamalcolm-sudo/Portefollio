@@ -50,6 +50,7 @@ export const seedProjects: Project[] = [
   },
   {
     id: 'marche-ya-cina',
+    freelance: true,
     visual: 'panier',
     title: 'Marché ya Cina',
     subtitle: 'Stock, ventes et caisse d’un commerce, sur téléphone',

@@ -32,6 +32,7 @@ function clean(input: Partial<Project>): Project {
     visual: isVisual(input.visual) ? input.visual : '',
     color: typeof input.color === 'string' && COLOR.test(input.color) ? input.color.toLowerCase() : '',
     status: str(input.status, 60),
+    freelance: input.freelance === true,
     problem: str(input.problem),
     solution: str(input.solution),
     result: str(input.result),

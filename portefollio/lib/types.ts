@@ -33,4 +33,6 @@ export type Project = {
   color?: string;
   // ex. « En production »
   status?: string;
+  // présenté parmi les réalisations de la page freelance
+  freelance?: boolean;
 };

@@ -28,9 +28,6 @@ export const FREELANCE_METHOD: Record<Step, string> = {
 export const FREELANCE_ABOUT =
   'Avant de construire mes propres applications, j’ai piloté des projets SI au Ministère de la Culture, chez Covéa et chez Beekast. Je sais ce qui fait qu’une équipe adopte un outil, ou le laisse de côté.';
 
-// projet présenté en détail sur la page
-export const FREELANCE_CASE = 'marche-ya-cina';
-
 // Demande de devis en plusieurs étapes : choix proposés (vérifiés aussi côté serveur)
 export const QUOTE_TYPES: [string, string][] = [
   ['panier', 'Une application métier'],

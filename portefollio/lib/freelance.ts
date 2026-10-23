@@ -30,3 +30,13 @@ export const FREELANCE_ABOUT =
 
 // projet présenté en détail sur la page
 export const FREELANCE_CASE = 'marche-ya-cina';
+
+// Demande de devis en plusieurs étapes : choix proposés (vérifiés aussi côté serveur)
+export const QUOTE_TYPES: [string, string][] = [
+  ['panier', 'Une application métier'],
+  ['carte', 'Un tableau de bord'],
+  ['engrenages', 'Une automatisation'],
+  ['ia', 'Un assistant IA'],
+  ['asterisque', 'Autre chose'],
+];
+export const QUOTE_DEADLINES = ['Dès que possible', 'D’ici 1 à 3 mois', 'Plus tard', 'Je ne sais pas encore'];

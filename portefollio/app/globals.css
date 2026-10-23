@@ -324,20 +324,44 @@ html:has(dialog[open]), html:has(.nav.is-open) { overflow: hidden; }
 .case-story .steps li { grid-template-columns: 36px minmax(0, 1fr); padding: 12px 0; font-size: 16px; }
 .about-text .title { font-size: clamp(36px, 4.6vw, 68px); }
 
-/* DEMANDE DE DEVIS */
-.quote { position: relative; display: flex; flex-direction: column; gap: 16px; width: min(760px, 100%); margin-top: 8px; padding: clamp(22px, 3vw, 40px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); text-align: left; }
-.quote-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.quote label { display: flex; flex-direction: column; gap: 8px; font: 400 12px/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.quote input, .quote textarea { width: 100%; padding: 14px 16px; background: var(--bg); border: 1px solid var(--line-strong); border-radius: 14px; font: 400 17px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink); resize: vertical; transition: border-color .2s, box-shadow .2s; }
-.quote input:focus, .quote textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(229, 118, 77, .25); }
+/* DEMANDE DE DEVIS : une question par étape */
+.quote { position: relative; display: flex; flex-direction: column; gap: 14px; width: min(760px, 100%); margin-top: 8px; padding: clamp(22px, 3vw, 40px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); text-align: left; }
+.quote-progress { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+.quote-progress span { height: 4px; border-radius: 2px; background: var(--line-strong); transition: background .4s; }
+.quote-progress span.is-done { background: var(--accent); }
+.quote-question { font-size: clamp(26px, 3vw, 40px); line-height: 1.08; letter-spacing: -.04em; }
+.quote-question:focus { outline: none; }
+.quote-step { margin-top: 10px; animation: step .45s var(--ease) both; }
+@keyframes step { from { opacity: 0; transform: translateX(24px); } }
+.quote-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; border: 0; }
+.quote-choices.types { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.quote-choice { position: relative; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 14px 18px; background: var(--bg); border: 1px solid var(--line-strong); border-radius: 16px; font-size: 17px; font-weight: 500; line-height: 1.25; color: var(--ink); cursor: pointer; transition: border-color .2s, background .2s, transform .25s var(--ease); }
+.types .quote-choice { flex-direction: column; justify-content: center; gap: 10px; padding: 18px 12px 16px; text-align: center; font-size: 15px; }
+.quote-choice img { width: 56px; height: auto; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .4)); transition: transform .4s var(--ease); }
+.quote-choice:hover { border-color: var(--ink); transform: translateY(-2px); }
+.quote-choice:hover img { transform: rotate(-8deg) scale(1.08); }
+/* le bouton radio reste accessible au clavier, la carte entière sert de case */
+.quote-choice input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.quote-choice:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--bg)); }
+.quote-choice:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+.quote-fields { display: flex; flex-direction: column; gap: 14px; }
+.quote-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.quote-field { display: flex; flex-direction: column; gap: 8px; font: 400 12px/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.quote input:not([type=radio]), .quote textarea { width: 100%; padding: 14px 16px; background: var(--bg); border: 1px solid var(--line-strong); border-radius: 14px; font: 400 17px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink); resize: vertical; transition: border-color .2s, box-shadow .2s; }
+.quote input:not([type=radio]):focus, .quote textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(229, 118, 77, .25); }
 .quote textarea::placeholder { color: var(--dim); }
 .quote-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .quote-error { font-size: 15px; color: #ff9d8a; }
 .quote-error a { text-decoration: underline; }
-.quote-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 4px; }
-.quote-actions small { flex: 1; min-width: 200px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.quote-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px 20px; margin-top: 8px; }
+.quote-back { display: inline-flex; align-items: center; min-height: 44px; margin-right: auto; font-weight: 500; white-space: nowrap; color: var(--muted); transition: color .2s; }
+.quote-back:hover { color: var(--ink); }
+.quote-note { font-size: 14px; line-height: 1.45; color: var(--muted); }
 .quote-sent { align-items: center; gap: 12px; padding-block: clamp(36px, 5vw, 56px); text-align: center; }
-.quote-sent h3 { font-size: clamp(24px, 2.4vw, 32px); }
+.quote-sent img { width: 88px; height: auto; animation: float 8s ease-in-out infinite; }
+.quote-sent h3 { font-size: clamp(26px, 2.6vw, 34px); }
+.quote-sent h3:focus { outline: none; }
+.quote-sent p { color: var(--soft); }
 .contact-alt { font-size: 16px; color: var(--muted); }
 .contact-alt .link { min-height: 44px; }
 
@@ -468,7 +492,10 @@ html:has(dialog[open]), html:has(.nav.is-open) { overflow: hidden; }
   .work-body { gap: 4px; }
   .work h3 { font-size: 18px; letter-spacing: -.03em; }
   .about { grid-template-columns: 1fr; }
-  .quote-row { grid-template-columns: 1fr; }
+  .quote-row, .quote-choices { grid-template-columns: 1fr; }
+  .quote-choices.types { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .types .quote-choice:last-child { grid-column: 1 / -1; }
+  .quote-actions .btn.pill { flex: 1; padding-inline: 18px; font-size: 16px; white-space: nowrap; }
   /* offres en lignes compactes : l'objet à gauche, le texte à droite */
   .builds { grid-template-columns: 1fr; gap: 12px; }
   .builds li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 16px; padding: 20px; }

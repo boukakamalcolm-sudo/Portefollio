@@ -2,13 +2,19 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Project, ProjectFile } from '@/lib/types';
+import { projectHref } from '@/lib/format';
+import { onFreelance, projectMedia, VISUALS, visualSrc } from '@/lib/visuals';
 
 const empty = (): Project => ({
   id: '',
   title: '',
   subtitle: '',
   sector: '',
+  role: '',
+  period: '',
   tags: [],
+  stack: [],
+  visual: '',
   problem: '',
   solution: '',
   result: '',
@@ -73,20 +79,33 @@ function discardUploads(urls: string[]) {
   }).catch(() => {});
 }
 
+// largeur et hauteur de l'image, pour distinguer une capture paysage d'un écran de téléphone
+async function imageSize(data: Blob) {
+  try {
+    const bitmap = await createImageBitmap(data);
+    const size = { width: bitmap.width, height: bitmap.height };
+    bitmap.close();
+    return size;
+  } catch {
+    return {};
+  }
+}
+
 function Editor({ initial, onCancel, onSaved, uploads }: {
   initial: Project;
   onCancel: () => void;
   onSaved: (p: Project[]) => void;
   uploads: React.MutableRefObject<string[]>;
 }) {
-  const [p, setP] = useState<Project>(initial);
+  const [p, setP] = useState<Project>({ ...initial, freelance: onFreelance(initial) });
   const [tags, setTags] = useState(initial.tags.join(', '));
+  const [stack, setStack] = useState((initial.stack ?? []).join(', '));
   const [uploading, setUploading] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const set = (k: keyof Project) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const set = (k: keyof Project) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setP({ ...p, [k]: e.target.value });
 
   async function addFiles(list: FileList | null) {
@@ -109,7 +128,7 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
         }
         const url = await sendFile(data, file.name, (pct) => setUploading(`Envoi de ${file.name} : ${Math.round(pct)} %`));
         uploads.current.push(url);
-        added.push({ url, name: file.name, kind: isPdf ? 'pdf' : 'image' });
+        added.push({ url, name: file.name, kind: isPdf ? 'pdf' : 'image', ...(isPdf ? {} : await imageSize(data)) });
       } catch (e) {
         setError(`${file.name} : ${(e as Error).message}`);
       }
@@ -117,6 +136,14 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
     setUploading(null);
     setP((cur) => ({ ...cur, files: [...cur.files, ...added] }));
     if (fileInput.current) fileInput.current.value = '';
+  }
+
+  // une seule icône : cocher une image décoche les autres
+  function updateFile(i: number, patch: Partial<ProjectFile>) {
+    setP((cur) => ({
+      ...cur,
+      files: cur.files.map((f, j) => (j === i ? { ...f, ...patch } : patch.icon ? { ...f, icon: false } : f)),
+    }));
   }
 
   function moveFile(i: number, dir: -1 | 1) {
@@ -135,6 +162,7 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
       const projects = await api('PUT', {
         ...p,
         tags: tags.split(',').map((t) => t.trim().toUpperCase()).filter(Boolean),
+        stack: stack.split(',').map((t) => t.trim()).filter(Boolean),
       });
       const kept = new Set(projects.flatMap((x) => x.files.map((f) => f.url)));
       discardUploads(uploads.current.filter((u) => !kept.has(u)));
@@ -152,24 +180,68 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
       <h3>{initial.id ? 'Modifier le projet' : 'Nouveau projet'}</h3>
       <label>Titre *<input value={p.title} onChange={set('title')} required maxLength={120} /></label>
       <label>Accroche<input value={p.subtitle} onChange={set('subtitle')} placeholder="Gestion de stock pour un commerce alimentaire" /></label>
-      <label>Secteur / client<input value={p.sector} onChange={set('sector')} placeholder="Restauration · Paris" /></label>
-      <label>Tags (séparés par des virgules)<input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="STOCK, CAISSE, APPLI WEB" /></label>
+      <label>Organisation / contexte<input value={p.sector} onChange={set('sector')} placeholder="Ministère de la Culture · Hauts-de-France" /></label>
+      <div className="editor-row">
+        <label>Mon rôle<input value={p.role ?? ''} onChange={set('role')} placeholder="Chef de projet SI" /></label>
+        <label>Période<input value={p.period ?? ''} onChange={set('period')} placeholder="2025 – 2026" /></label>
+      </div>
+      <div className="editor-row">
+        <label>Statut<input value={p.status ?? ''} onChange={set('status')} placeholder="En production" /></label>
+        <label>Couleur des écrans (celle de l’application)
+          <span className="editor-color">
+            <input type="color" value={p.color || '#eeede8'} onChange={set('color')} aria-label="Choisir la couleur" />
+            <input value={p.color ?? ''} onChange={set('color')} placeholder="#d6d4fc" maxLength={7} />
+          </span>
+        </label>
+      </div>
+      <label className="editor-check">
+        <input type="checkbox" checked={!!p.freelance} onChange={(e) => setP({ ...p, freelance: e.target.checked })} />
+        Afficher dans les réalisations de la page freelance
+      </label>
+      <label>Tags (séparés par des virgules)<input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="CADRAGE, DONNÉES, DÉPLOIEMENT" /></label>
+      <label>Outils (séparés par des virgules)<input value={stack} onChange={(e) => setStack(e.target.value)} placeholder="Jira, BPMN, Power Automate" /></label>
+      <div className="editor-visual">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={visualSrc(p)} alt="" width={56} height={56} />
+        <label>Objet 3D de couverture (si le projet n’a pas d’image)
+          <select value={p.visual ?? ''} onChange={set('visual')}>
+            <option value="">Automatique (objet prévu pour ce projet, sinon astérisque)</option>
+            {Object.entries(VISUALS).filter(([k]) => k !== 'asterisque').map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+          </select>
+        </label>
+      </div>
       <label>Le problème<textarea rows={4} value={p.problem} onChange={set('problem')} /></label>
-      <label>Ce qui a été fait<textarea rows={4} value={p.solution} onChange={set('solution')} /></label>
-      <label>Le résultat<textarea rows={3} value={p.result} onChange={set('result')} /></label>
+      <label>Ce que j’ai fait (une action par ligne)<textarea rows={6} value={p.solution} onChange={set('solution')} /></label>
+      <label>Résultat<textarea rows={3} value={p.result} onChange={set('result')} /></label>
 
       <div className="files">
-        <span className="files-title">Fichiers (images et PDF, 4 Mo max ; les photos sont réduites automatiquement). La 1re image sert de couverture.</span>
+        <span className="files-title">
+          Fichiers (images et PDF, 4 Mo max ; les photos sont réduites automatiquement). Les trois premiers écrans
+          apparaissent sur la carte ; le titre et l’explication de chaque écran s’affichent dessous, sur la page projet.
+        </span>
         {p.files.map((f, i) => (
-          <div className="file-row" key={f.url}>
-            {f.kind === 'image'
-              // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={f.url} alt="" />
-              : <span className="file-pdf">PDF</span>}
-            <a href={f.url} target="_blank" rel="noopener noreferrer">{f.name}</a>
-            <button type="button" onClick={() => moveFile(i, -1)} aria-label="Monter">↑</button>
-            <button type="button" onClick={() => moveFile(i, 1)} aria-label="Descendre">↓</button>
-            <button type="button" className="danger" onClick={() => setP({ ...p, files: p.files.filter((x) => x.url !== f.url) })} aria-label="Retirer">✕</button>
+          <div className="file-item" key={f.url}>
+            <div className="file-row">
+              {f.kind === 'image'
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={f.url} alt="" />
+                : <span className="file-pdf">PDF</span>}
+              <a href={f.url} target="_blank" rel="noopener noreferrer">{f.name}</a>
+              <button type="button" onClick={() => moveFile(i, -1)} aria-label="Monter">↑</button>
+              <button type="button" onClick={() => moveFile(i, 1)} aria-label="Descendre">↓</button>
+              <button type="button" className="danger" onClick={() => setP({ ...p, files: p.files.filter((x) => x.url !== f.url) })} aria-label="Retirer">✕</button>
+            </div>
+            {f.kind === 'image' && (
+              <div className="file-meta">
+                <label className="file-icon"><input type="checkbox" checked={!!f.icon} onChange={(e) => updateFile(i, { icon: e.target.checked })} /> Icône de l’application</label>
+                {!f.icon && (
+                  <>
+                    <input value={f.title ?? ''} onChange={(e) => updateFile(i, { title: e.target.value })} placeholder="Titre de l’écran (ex. Ventes)" aria-label="Titre de l’écran" maxLength={80} />
+                    <input value={f.caption ?? ''} onChange={(e) => updateFile(i, { caption: e.target.value })} placeholder="Explication (ex. Suivre les ventes en temps réel)" aria-label="Explication de l’écran" maxLength={300} />
+                  </>
+                )}
+              </div>
+            )}
           </div>
         ))}
         <input
@@ -238,6 +310,13 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
     run(() => api('DELETE', { id: p.id }), 'Projet supprimé');
   }
 
+  function importDefaults() {
+    const ok = confirm(
+      'Importer les projets du CV ? Ils sont ajoutés ou mis à jour (textes remplacés, images et PDF conservés) et passent en tête de liste. Vos autres projets restent inchangés.',
+    );
+    if (ok) run(() => api('POST', {}), 'Contenu du CV importé');
+  }
+
   function move(i: number, dir: -1 | 1) {
     const j = i + dir;
     if (j < 0 || j >= projects.length) return;
@@ -257,8 +336,10 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
         <a href="/" className="brand">MB<span>.</span></a>
         <span className="label">Espace admin</span>
         <div className="admin-head-actions">
-          <a className="btn-link" href="/" target="_blank" rel="noopener noreferrer">Voir le site ↗</a>
-          <button className="btn-link" onClick={logout}>Déconnexion</button>
+          <a className="link" href="/" target="_blank" rel="noopener noreferrer">Voir le site ↗</a>
+          {/* page non liée depuis le site : son adresse se donne directement aux clients */}
+          <a className="link" href="/freelance" target="_blank" rel="noopener noreferrer">Page freelance ↗</a>
+          <button className="link" onClick={logout}>Déconnexion</button>
         </div>
       </header>
 
@@ -287,21 +368,23 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
                 <p className="label">Réalisations</p>
                 <h1>{projects.length} projet{projects.length > 1 ? 's' : ''}</h1>
               </div>
-              <button className="btn" onClick={() => setEditing(empty())} disabled={busy}>+ Ajouter un projet</button>
+              <div className="admin-card-actions">
+                <button className="btn ghost" onClick={importDefaults} disabled={busy || !blobReady}>Importer le contenu du CV</button>
+                <button className="btn" onClick={() => setEditing(empty())} disabled={busy}>+ Ajouter un projet</button>
+              </div>
             </div>
             {error && <p className="form-error" role="alert">{error}</p>}
             <ul className="admin-list">
               {projects.map((p, i) => {
-                const cover = p.files.find((f) => f.kind === 'image');
+                const media = projectMedia(p);
+                const cover = media.icon ?? media.screens[0]?.url;
                 return (
                   <li key={p.id}>
-                    {cover
-                      // eslint-disable-next-line @next/next/no-img-element
-                      ? <img src={cover.url} alt="" className="admin-thumb" />
-                      : <span className="admin-thumb empty">{String(i + 1).padStart(2, '0')}</span>}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={cover ?? visualSrc(p)} alt="" className={`admin-thumb${cover ? '' : ' is-3d'}`} />
                     <div className="admin-item">
-                      <strong>{p.title}</strong>
-                      <small>{p.sector || 'Sans secteur'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}</small>
+                      <strong><a href={projectHref(p.id)} target="_blank" rel="noopener noreferrer">{p.title} ↗</a></strong>
+                      <small>{p.sector || 'Sans contexte'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}{onFreelance(p) && ' · page freelance'}</small>
                     </div>
                     <div className="row-actions">
                       <button onClick={() => move(i, -1)} disabled={busy || i === 0} aria-label={`Monter ${p.title}`}>↑</button>

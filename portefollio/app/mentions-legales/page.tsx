@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Shell from '@/components/Shell';
 import { CONTACT_EMAIL, LEGAL, LEGAL_NAME } from '@/lib/config';
 
 export const metadata: Metadata = {
@@ -8,37 +9,37 @@ export const metadata: Metadata = {
 
 export default function MentionsLegales() {
   return (
-    <main className="legal">
-      <a href="/" className="brand">MB<span>.</span></a>
-      <h1>Mentions légales</h1>
+    <Shell>
+      <article className="legal">
+        <h1>Mentions légales</h1>
 
-      <h2>ÉDITEUR DU SITE</h2>
-      <p>{LEGAL_NAME}{LEGAL.status && ` · ${LEGAL.status}`}</p>
-      {LEGAL.siret && <p>SIRET : {LEGAL.siret}</p>}
-      {LEGAL.address && <p>{LEGAL.address}</p>}
-      <p>Contact : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
-      <p>Directeur de la publication : {LEGAL_NAME}</p>
+        <h2>Éditeur du site</h2>
+        <p>{LEGAL_NAME}{LEGAL.status && ` · ${LEGAL.status}`}</p>
+        {LEGAL.siret && <p>SIRET : {LEGAL.siret}</p>}
+        {LEGAL.address && <p>{LEGAL.address}</p>}
+        <p>Contact : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+        <p>Directeur de la publication : {LEGAL_NAME}</p>
 
-      <h2>HÉBERGEMENT</h2>
-      <p>Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis · vercel.com</p>
+        <h2>Hébergement</h2>
+        <p>Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis · vercel.com</p>
 
-      <h2>DONNÉES PERSONNELLES</h2>
-      <p>
-        Le formulaire de contact recueille votre nom, votre e-mail, le nom de votre entreprise et votre message. Ces
-        informations servent uniquement à répondre à votre demande : elles me sont transmises par e-mail via le
-        service Resend et ne sont ni revendues ni utilisées à des fins publicitaires. Elles sont conservées le temps
-        nécessaire au suivi de votre demande. Vous pouvez demander leur consultation ou leur suppression à tout
-        moment à l’adresse ci-dessus. Le site n’utilise pas d’outil de mesure d’audience et ne dépose aucun cookie
-        publicitaire.
-      </p>
+        <h2>Données personnelles</h2>
+        <p>
+          Le formulaire de demande de devis transmet votre nom, votre e-mail, votre entreprise et votre message par e-mail, via le prestataire d’envoi Resend ; ces informations ne sont pas conservées sur le site. Si vous m’écrivez par e-mail ou via ce formulaire,
+          votre message sert uniquement à vous répondre ; vous pouvez demander sa suppression à tout moment à l’adresse
+          ci-dessus. Le site n’utilise ni outil de mesure d’audience ni cookie publicitaire. Un cookie technique est
+          déposé uniquement lors de la connexion à l’espace d’administration.
+        </p>
 
-      <h2>PROPRIÉTÉ INTELLECTUELLE</h2>
-      <p>
-        Les textes, visuels et captures présentés sur ce site sont la propriété de leur auteur ou de ses clients, qui
-        en ont autorisé la diffusion. Toute reproduction sans autorisation est interdite.
-      </p>
+        <h2>Propriété intellectuelle</h2>
+        <p>
+          Les textes, visuels et captures présentés sur ce site sont la propriété de leur auteur ou de ses clients, qui
+          en ont autorisé la diffusion. Toute reproduction sans autorisation est interdite. Les illustrations 3D ont été
+          créées avec Canva.
+        </p>
 
-      <p style={{ marginTop: 48 }}><a href="/">← Retour au site</a></p>
-    </main>
+        <p className="legal-back"><a className="hotspot back-link" href="/"><i aria-hidden="true" />Retour au site</a></p>
+      </article>
+    </Shell>
   );
 }

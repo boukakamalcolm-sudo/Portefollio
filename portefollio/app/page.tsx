@@ -6,6 +6,5 @@ import { getProjects } from '@/lib/store';
 export const revalidate = 3600;
 
 export default async function Page() {
-  const projects = await getProjects();
-  return <Site initialProjects={projects} />;
+  return <Site projects={await getProjects()} />;
 }

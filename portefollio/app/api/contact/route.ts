@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { CONTACT_EMAIL } from '@/lib/config';
+import { FREELANCE_EMAIL, QUOTE_DEADLINES, QUOTE_TYPES } from '@/lib/freelance';
+
+// Demandes de devis de la page freelance.
 
 // Sans domaine vérifié sur Resend, l'expéditeur doit être onboarding@resend.dev
 // et le destinataire l'adresse du compte Resend.
@@ -35,6 +37,9 @@ export async function POST(req: Request) {
   const email = str(body.email, 200);
   const company = str(body.company, 160);
   const message = str(body.message, 5000);
+  // choix des étapes du formulaire, gardés seulement s'ils font partie des réponses proposées
+  const type = QUOTE_TYPES.map(([, label]) => label).find((t) => t === body.type) ?? '';
+  const deadline = QUOTE_DEADLINES.find((d) => d === body.deadline) ?? '';
   if (!name || !EMAIL.test(email) || message.length < 10) {
     return NextResponse.json({ error: 'Merci de remplir votre nom, un e-mail valide et quelques mots sur votre besoin.' }, { status: 400 });
   }
@@ -50,10 +55,18 @@ export async function POST(req: Request) {
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       from: FROM,
-      to: [CONTACT_EMAIL],
+      to: [FREELANCE_EMAIL],
       reply_to: email,
-      subject: `Nouveau contact : ${name}${company ? ` (${company})` : ''}`,
-      text: [`Nom : ${name}`, `E-mail : ${email}`, `Entreprise : ${company || '—'}`, '', message].join('\n'),
+      subject: `Demande de devis : ${name}${company ? ` (${company})` : ''}${type ? ` · ${type}` : ''}`,
+      text: [
+        `Projet : ${type || 'non précisé'}`,
+        `Échéance : ${deadline || 'non précisée'}`,
+        `Nom : ${name}`,
+        `E-mail : ${email}`,
+        `Entreprise : ${company || 'non précisée'}`,
+        '',
+        message,
+      ].join('\n'),
     }),
   }).catch(() => null);
 

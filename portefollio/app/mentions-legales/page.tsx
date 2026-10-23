@@ -25,7 +25,7 @@ export default function MentionsLegales() {
 
         <h2>Données personnelles</h2>
         <p>
-          Ce site ne contient pas de formulaire et ne collecte aucune donnée personnelle. Si vous m’écrivez par e-mail,
+          Le formulaire de demande de devis transmet votre nom, votre e-mail, votre entreprise et votre message par e-mail, via le prestataire d’envoi Resend ; ces informations ne sont pas conservées sur le site. Si vous m’écrivez par e-mail ou via ce formulaire,
           votre message sert uniquement à vous répondre ; vous pouvez demander sa suppression à tout moment à l’adresse
           ci-dessus. Le site n’utilise ni outil de mesure d’audience ni cookie publicitaire. Un cookie technique est
           déposé uniquement lors de la connexion à l’espace d’administration.

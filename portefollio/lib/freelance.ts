@@ -3,6 +3,8 @@
 import type { Step } from './profile';
 
 export const FREELANCE_NAME = 'Malcolm';
+// adresse pro : reçoit les demandes de devis et s'affiche sur la page
+export const FREELANCE_EMAIL = 'boukakamalcolm.pro@gmail.com';
 export const FREELANCE_ROLE = 'Product builder';
 export const FREELANCE_PITCH =
   'Je suis Malcolm, product builder. Je conçois et je construis les applications et les outils dont votre activité a besoin, du premier échange à la mise en ligne.';

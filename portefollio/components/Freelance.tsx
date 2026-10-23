@@ -1,11 +1,12 @@
 import Image from 'next/image';
 import type { Project } from '@/lib/types';
-import { CONTACT_EMAIL, LINKEDIN_URL, LOCATION } from '@/lib/config';
+import { LINKEDIN_URL, LOCATION } from '@/lib/config';
 import { lines } from '@/lib/format';
-import { BUILDS, FREELANCE_ABOUT, FREELANCE_CASE, FREELANCE_METHOD, FREELANCE_NAME, FREELANCE_PITCH, FREELANCE_ROLE } from '@/lib/freelance';
+import { BUILDS, FREELANCE_ABOUT, FREELANCE_CASE, FREELANCE_EMAIL, FREELANCE_METHOD, FREELANCE_NAME, FREELANCE_PITCH, FREELANCE_ROLE } from '@/lib/freelance';
 import { projectMedia, seedFor } from '@/lib/visuals';
 import Gallery from './Gallery';
 import Method from './Method';
+import QuoteForm from './QuoteForm';
 import { visualStyle } from './ProjectCard';
 import Shell from './Shell';
 
@@ -17,10 +18,8 @@ const NAV = {
     ['#realisation', 'Réalisation'],
     ['#methode', 'Méthode'],
   ],
-  cta: ['#contact', 'Demander un devis'],
+  cta: ['#devis', 'Demander un devis'],
 } as const;
-
-const quote = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Demande de devis')}`;
 
 export default function Freelance({ projects }: { projects: Project[] }) {
   const featured = projects.find((p) => p.id === FREELANCE_CASE || seedFor(p)?.id === FREELANCE_CASE);
@@ -29,7 +28,7 @@ export default function Freelance({ projects }: { projects: Project[] }) {
   const steps = featured ? lines(featured.solution) : [];
 
   return (
-    <Shell nav={NAV} owner={FREELANCE_NAME}>
+    <Shell nav={NAV} owner={FREELANCE_NAME} email={FREELANCE_EMAIL}>
       <section className="hero" aria-labelledby="hero-title">
         <p className="hero-badge">
           <Image src="/3d/asterisque.png" alt="" width={28} height={28} priority />
@@ -40,7 +39,7 @@ export default function Freelance({ projects }: { projects: Project[] }) {
         </h1>
         <p className="hero-role">{FREELANCE_PITCH}</p>
         <div className="actions hero-actions">
-          <a className="btn pill" href={quote}>Demander un devis <span aria-hidden="true">→</span></a>
+          <a className="btn pill" href="#devis">Demander un devis <span aria-hidden="true">→</span></a>
           {featured && <a className="btn pill ghost" href="#realisation">Voir une réalisation</a>}
         </div>
       </section>
@@ -102,11 +101,11 @@ export default function Freelance({ projects }: { projects: Project[] }) {
         <Image className="contact-3d" src="/3d/asterisque.png" alt="" width={200} height={200} />
         <h2 id="contact-title" className="contact-title reveal">Un projet&nbsp;?<span className="accent"> Parlons-en.</span></h2>
         <p className="contact-sub reveal">Chaque projet est sur devis, après un premier échange pour comprendre votre besoin.</p>
-        <div className="actions reveal">
-          <a className="btn pill" href={quote}>Demander un devis <span aria-hidden="true">→</span></a>
-          <a className="btn pill ghost" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-          {LINKEDIN_URL && <a className="btn pill ghost" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn <span aria-hidden="true">↗</span></a>}
-        </div>
+        <QuoteForm />
+        <p className="contact-alt">
+          Ou écrivez-moi directement : <a className="link" href={`mailto:${FREELANCE_EMAIL}`}>{FREELANCE_EMAIL}</a>
+          {LINKEDIN_URL && <> · <a className="link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></>}
+        </p>
       </section>
     </Shell>
   );

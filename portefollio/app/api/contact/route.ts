@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { CONTACT_EMAIL } from '@/lib/config';
+import { FREELANCE_EMAIL } from '@/lib/freelance';
+
+// Demandes de devis de la page freelance.
 
 // Sans domaine vérifié sur Resend, l'expéditeur doit être onboarding@resend.dev
 // et le destinataire l'adresse du compte Resend.
@@ -50,10 +52,10 @@ export async function POST(req: Request) {
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       from: FROM,
-      to: [CONTACT_EMAIL],
+      to: [FREELANCE_EMAIL],
       reply_to: email,
-      subject: `Nouveau contact : ${name}${company ? ` (${company})` : ''}`,
-      text: [`Nom : ${name}`, `E-mail : ${email}`, `Entreprise : ${company || '—'}`, '', message].join('\n'),
+      subject: `Demande de devis : ${name}${company ? ` (${company})` : ''}`,
+      text: [`Nom : ${name}`, `E-mail : ${email}`, `Entreprise : ${company || 'non précisée'}`, '', message].join('\n'),
     }),
   }).catch(() => null);
 

@@ -324,6 +324,23 @@ html:has(dialog[open]), html:has(.nav.is-open) { overflow: hidden; }
 .case-story .steps li { grid-template-columns: 36px minmax(0, 1fr); padding: 12px 0; font-size: 16px; }
 .about-text .title { font-size: clamp(36px, 4.6vw, 68px); }
 
+/* DEMANDE DE DEVIS */
+.quote { position: relative; display: flex; flex-direction: column; gap: 16px; width: min(760px, 100%); margin-top: 8px; padding: clamp(22px, 3vw, 40px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); text-align: left; }
+.quote-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.quote label { display: flex; flex-direction: column; gap: 8px; font: 400 12px/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.quote input, .quote textarea { width: 100%; padding: 14px 16px; background: var(--bg); border: 1px solid var(--line-strong); border-radius: 14px; font: 400 17px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink); resize: vertical; transition: border-color .2s, box-shadow .2s; }
+.quote input:focus, .quote textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(229, 118, 77, .25); }
+.quote textarea::placeholder { color: var(--dim); }
+.quote-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.quote-error { font-size: 15px; color: #ff9d8a; }
+.quote-error a { text-decoration: underline; }
+.quote-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 4px; }
+.quote-actions small { flex: 1; min-width: 200px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.quote-sent { align-items: center; gap: 12px; padding-block: clamp(36px, 5vw, 56px); text-align: center; }
+.quote-sent h3 { font-size: clamp(24px, 2.4vw, 32px); }
+.contact-alt { font-size: 16px; color: var(--muted); }
+.contact-alt .link { min-height: 44px; }
+
 /* MENTIONS LÉGALES */
 .legal { max-width: 900px; margin: 0 auto; padding: calc(var(--nav) + 40px) var(--gutter) 64px; }
 .legal h1 { margin-bottom: 32px; font-size: clamp(44px, 6vw, 88px); letter-spacing: -.05em; }
@@ -451,6 +468,7 @@ html:has(dialog[open]), html:has(.nav.is-open) { overflow: hidden; }
   .work-body { gap: 4px; }
   .work h3 { font-size: 18px; letter-spacing: -.03em; }
   .about { grid-template-columns: 1fr; }
+  .quote-row { grid-template-columns: 1fr; }
   /* offres en lignes compactes : l'objet à gauche, le texte à droite */
   .builds { grid-template-columns: 1fr; gap: 12px; }
   .builds li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 16px; padding: 20px; }

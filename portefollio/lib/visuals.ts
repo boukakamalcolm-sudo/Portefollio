@@ -21,7 +21,7 @@ const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCa
 
 // Le même projet dans le contenu de départ (même identifiant ou même titre), pour les projets
 // enregistrés avant l'ajout des objets 3D et des captures
-const seedFor = (project: Pick<Project, 'id' | 'title'>) =>
+export const seedFor = (project: Pick<Project, 'id' | 'title'>) =>
   seedProjects.find((s) => s.id === project.id || norm(s.title) === norm(project.title));
 
 // Objet choisi dans l'admin ; sinon celui du contenu de départ ; sinon l'astérisque, objet neutre.

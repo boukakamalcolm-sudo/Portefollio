@@ -333,6 +333,8 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
         <span className="label">Espace admin</span>
         <div className="admin-head-actions">
           <a className="link" href="/" target="_blank" rel="noopener noreferrer">Voir le site ↗</a>
+          {/* page non liée depuis le site : son adresse se donne directement aux clients */}
+          <a className="link" href="/freelance" target="_blank" rel="noopener noreferrer">Page freelance ↗</a>
           <button className="link" onClick={logout}>Déconnexion</button>
         </div>
       </header>

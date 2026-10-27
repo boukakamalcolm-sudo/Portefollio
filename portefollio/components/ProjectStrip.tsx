@@ -34,7 +34,7 @@ export default function ProjectStrip({ projects }: { projects: Project[] }) {
   return (
     <section className="strip" id="projets" aria-labelledby="projets-title">
       <header className="section-head strip-head">
-        <h2 id="projets-title" className="title">Projets.<span> Un projet, une page.</span></h2>
+        <h2 id="projets-title" className="title">Réalisations.<span> Des outils en production.</span></h2>
       </header>
       <div className={`strip-window${loop ? ' is-loop' : ''}`}>
         <ul className="strip-track" style={{ '--count': projects.length } as React.CSSProperties}>

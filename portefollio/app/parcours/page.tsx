@@ -6,20 +6,15 @@ import { CountUp } from '@/components/motion';
 import Shell from '@/components/Shell';
 import Timeline from '@/components/Timeline';
 import { CONTACT_EMAIL, CV_URL, LEGAL_NAME, LINKEDIN_URL } from '@/lib/config';
-import { pad, projectHref } from '@/lib/format';
 import { EDUCATION, PITCH, XP } from '@/lib/profile';
-import { getProjects } from '@/lib/store';
-import { onFreelance } from '@/lib/visuals';
 
-// Parcours : chiffres clés, frise des expériences, diplômes en escalier, missions en entreprise.
+// Parcours : chiffres clés, frise des expériences (détail en paragraphes au clic), diplômes en escalier.
 // Reliée uniquement depuis l'en-tête.
 export const metadata: Metadata = {
   title: 'Parcours',
   description: PITCH,
   alternates: { canonical: '/parcours' },
 };
-
-export const revalidate = 3600;
 
 // chiffres repris des expériences (lib/profile.ts)
 const STATS: [number, string, string][] = [
@@ -32,17 +27,7 @@ const STATS: [number, string, string][] = [
 
 const external = { target: '_blank', rel: 'noopener noreferrer' } as const;
 
-export default async function ParcoursPage() {
-  const projects = await getProjects();
-  const byId = new Map(projects.map((p) => [p.id, p]));
-  const missions = projects.filter((p) => !onFreelance(p));
-  const items = XP.map((x) => ({
-    ...x,
-    related: x.projects.flatMap((id) => {
-      const p = byId.get(id);
-      return p ? [{ title: p.title, href: projectHref(p.id) }] : [];
-    }),
-  }));
+export default function ParcoursPage() {
   const skills = [...new Set(XP.flatMap((x) => x.skills))];
   const half = Math.ceil(skills.length / 2);
   const firstYear = Math.min(...XP.flatMap((x) => [...x.period.matchAll(/\d{4}/g)].map((m) => +m[0])));
@@ -96,7 +81,7 @@ export default async function ParcoursPage() {
         <header className="section-head">
           <h2 id="xp-title" className="title">Expériences.<span> De la relation client au pilotage SI.</span></h2>
         </header>
-        <Timeline items={items} />
+        <Timeline items={XP} />
       </section>
 
       {/* diplômes en escalier : chaque marche un cran plus haut */}
@@ -118,26 +103,6 @@ export default async function ParcoursPage() {
           <p><strong>Anglais courant</strong> · français natif</p>
         </div>
       </section>
-
-      {missions.length > 0 && (
-        <section className="section" id="missions" aria-labelledby="missions-title">
-          <header className="section-head">
-            <h2 id="missions-title" className="title">Missions.<span> Ce que j’ai mené en entreprise.</span></h2>
-          </header>
-          <ol className="pc-missions">
-            {missions.map((p, i) => (
-              <li key={p.id}>
-                <a href={projectHref(p.id)}>
-                  <span className="pc-num">{pad(i + 1)}</span>
-                  <strong>{p.title}</strong>
-                  <span className="pc-sector">{p.sector}</span>
-                  <span className="pc-arrow" aria-hidden="true">→</span>
-                </a>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
 
       <section className="section pc-end" aria-label="Contact">
         <div className="actions">

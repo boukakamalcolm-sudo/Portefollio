@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { pad } from '@/lib/format';
-import { METHOD, type Experience } from '@/lib/profile';
+import type { Experience } from '@/lib/profile';
 import InView from './InView';
 
-export type TimelineItem = Experience & { related: { title: string; href: string }[] };
+export type TimelineItem = Experience;
 
 const MONTHS: Record<string, number> = { janv: 0, févr: 1, mars: 2, avr: 3, mai: 4, juin: 5, juil: 6, août: 7, sept: 8, oct: 9, nov: 10, déc: 11 };
 const FROM = 2021;
@@ -73,30 +72,9 @@ export default function Timeline({ items }: { items: TimelineItem[] }) {
             <h3 id="xp-dialog-title">{open.role}</h3>
             <p className="xp-org">{open.org}{open.place && ` · ${open.place}`}</p>
             {open.figure && <p className="xp-figure"><strong>{open.figure[0]}</strong><span>{open.figure[1]}</span></p>}
-            <p className="xp-dialog-summary">{open.summary}</p>
-            {open.steps.length > 0 && (
-              <>
-                <h4 className="label">Ma façon de travailler</h4>
-                <ol className="xp-steps">
-                  {METHOD.map((step, i) => {
-                    const done = open.steps.find(([k]) => k === step);
-                    return done && (
-                      <li key={step}>
-                        <span className="xp-step">{pad(i + 1)} · {step}</span>
-                        <p>{done[1]}</p>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </>
-            )}
+            <div className="xp-story">{open.story.map((t) => <p key={t}>{t}</p>)}</div>
             <h4 className="label">Compétences</h4>
             <ul className="bubbles">{open.skills.map((s) => <li key={s}>{s}</li>)}</ul>
-            {open.related.length > 0 && (
-              <p className="xp-links">
-                {open.related.map((p) => <a key={p.href} className="link" href={p.href}>{p.title} →</a>)}
-              </p>
-            )}
           </div>
         )}
       </dialog>

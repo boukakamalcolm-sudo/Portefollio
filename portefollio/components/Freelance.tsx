@@ -4,6 +4,7 @@ import { LINKEDIN_URL, LOCATION } from '@/lib/config';
 import { lines } from '@/lib/format';
 import { BUILDS, FREELANCE_ABOUT, FREELANCE_EMAIL, FREELANCE_METHOD, FREELANCE_NAME, FREELANCE_PITCH, FREELANCE_ROLE } from '@/lib/freelance';
 import { onFreelance, projectMedia, visualSrc } from '@/lib/visuals';
+import Asterisk from './Asterisk';
 import Cases, { type Case } from './Cases';
 import Method from './Method';
 import QuoteForm from './QuoteForm';
@@ -40,19 +41,25 @@ export default function Freelance({ projects }: { projects: Project[] }) {
   });
 
   return (
-    <Shell nav={NAV} owner={FREELANCE_NAME} email={FREELANCE_EMAIL}>
+    <Shell nav={NAV} owner={FREELANCE_NAME} email={FREELANCE_EMAIL} theme="da-rouge">
       <section className="hero" aria-labelledby="hero-title">
         <p className="hero-badge">
-          <Image src="/3d/asterisque.png" alt="" width={28} height={28} priority />
+          <Asterisk />
           {FREELANCE_ROLE} · {LOCATION}
         </p>
-        <h1 id="hero-title" className="hero-title">
-          <span>Votre outil,</span> <span className="accent">sur mesure.</span>
-        </h1>
-        <p className="hero-role">{FREELANCE_PITCH}</p>
-        <div className="actions hero-actions">
-          <a className="btn pill" href="#devis">Demander un devis <span aria-hidden="true">→</span></a>
-          {cases.length > 0 && <a className="btn pill ghost" href="#realisation">Voir une réalisation</a>}
+        <div className="hero-stack">
+          <Asterisk spin className="hero-ast" />
+          {/* titre en escalier : chaque ligne a son propre retrait */}
+          <h1 id="hero-title" className="hero-title">
+            <span>Votre outil,</span> <span className="accent">sur mesure.</span>
+          </h1>
+        </div>
+        <div className="hero-foot">
+          <p className="hero-role">{FREELANCE_PITCH}</p>
+          <div className="actions hero-actions">
+            <a className="btn pill" href="#devis">Demander un devis <span aria-hidden="true">→</span></a>
+            {cases.length > 0 && <a className="btn pill ghost" href="#realisation">Voir une réalisation</a>}
+          </div>
         </div>
       </section>
 
@@ -61,9 +68,9 @@ export default function Freelance({ projects }: { projects: Project[] }) {
           <h2 id="construire-title" className="title">Ce que je construis.<span> Des outils qui collent à votre activité.</span></h2>
         </header>
         <ul className="builds">
-          {BUILDS.map(([visual, title, text]) => (
+          {BUILDS.map(([, title, text]) => (
             <li key={title} className="reveal">
-              <Image src={`/3d/${visual}.png`} alt="" width={160} height={160} />
+              <span className="build-icon"><Asterisk /></span>
               <h3>{title}</h3>
               <p>{text}</p>
             </li>
@@ -88,7 +95,7 @@ export default function Freelance({ projects }: { projects: Project[] }) {
       </section>
 
       <section className="section contact" id="contact" aria-labelledby="contact-title">
-        <Image className="contact-3d" src="/3d/asterisque.png" alt="" width={200} height={200} />
+        <Asterisk spin className="contact-3d" />
         <h2 id="contact-title" className="contact-title reveal">Un projet&nbsp;?<span className="accent"> Parlons-en.</span></h2>
         <p className="contact-sub reveal">Chaque projet est sur devis, après un premier échange pour comprendre votre besoin.</p>
         <QuoteForm />

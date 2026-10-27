@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
+import Asterisk from './Asterisk';
 import { FREELANCE_EMAIL, QUOTE_DEADLINES, QUOTE_TYPES } from '@/lib/freelance';
 
 // espace insécable avant « ? » : le point d'interrogation ne part jamais seul à la ligne
@@ -57,7 +57,7 @@ export default function QuoteForm() {
   if (state.status === 'sent') {
     return (
       <div className="quote quote-sent" role="status">
-        <Image src="/3d/asterisque.png" alt="" width={120} height={120} />
+        <Asterisk spin className="quote-sent-ast" />
         <h3 ref={title} tabIndex={-1}>Merci, je reviens vers vous très vite.</h3>
         <p>Votre demande est bien partie. Je vous réponds à {data.email}.</p>
         <button className="link" onClick={() => { setData(EMPTY); setStep(0); setState({ status: 'idle' }); }}>
@@ -79,10 +79,10 @@ export default function QuoteForm() {
         {step === 0 && (
           <fieldset className="quote-choices types">
             <legend className="sr-only">{STEPS[0]}</legend>
-            {QUOTE_TYPES.map(([visual, label]) => (
+            {QUOTE_TYPES.map(([, label]) => (
               <label key={label} className="quote-choice">
                 <input type="radio" name="type" value={label} required checked={data.type === label} onChange={set('type')} />
-                <Image src={`/3d/${visual}.png`} alt="" width={120} height={120} />
+                <span className="choice-icon"><Asterisk /></span>
                 <span>{label}</span>
               </label>
             ))}

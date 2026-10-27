@@ -1,4 +1,9 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+// police de la DA rouge, chargée uniquement sur cette page
+import '@fontsource/archivo/500.css';
+import '@fontsource/archivo/600.css';
+import '@fontsource/archivo/700.css';
+import '@fontsource/archivo/800.css';
 import Freelance from '@/components/Freelance';
 import { FREELANCE_NAME, FREELANCE_PITCH, FREELANCE_ROLE } from '@/lib/freelance';
 import { getProjects } from '@/lib/store';
@@ -15,6 +20,9 @@ export const metadata: Metadata = {
   openGraph: { type: 'website', locale: 'fr_FR', url: '/freelance', siteName: FREELANCE_NAME, title, description: FREELANCE_PITCH },
   twitter: { card: 'summary_large_image', title, description: FREELANCE_PITCH },
 };
+
+// barre du navigateur mobile aux couleurs de la page
+export const viewport: Viewport = { themeColor: '#dc1230', colorScheme: 'light' };
 
 export const revalidate = 3600;
 

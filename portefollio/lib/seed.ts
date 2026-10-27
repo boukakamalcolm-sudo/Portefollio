@@ -55,48 +55,32 @@ export const seedProjects: Project[] = [
     title: 'Marché ya Cina',
     subtitle: 'Stock, ventes et caisse d’un commerce, sur téléphone',
     sector: 'Projet personnel · Commerce alimentaire, Brazzaville',
-    role: 'Product builder : conception et développement',
-    period: '',
+    role: 'Product builder : cadrage, conception, développement assisté par IA, mise en ligne',
+    period: '2026',
     status: 'En production',
     color: '#d6d4fc',
     tags: ['PRODUCT BUILDING', 'APPLI WEB', 'IA'],
     stack: ['Next.js', 'Supabase', 'Vercel', 'Claude'],
     problem:
-      'Un commerce familial qui suivait son stock et ses ventes à la main. Impossible de savoir rapidement ce qui restait en rayon, ce qui se vendait, ni combien il y avait réellement en caisse.',
+      'Un commerce alimentaire familial à Brazzaville, tenu avec un cahier papier et un fichier Excel fragile. Le gérant, souvent à distance, n’avait pas de réponse fiable à deux questions : « combien j’ai vraiment gagné ce mois-ci ? » et « qu’est-ce que je dois racheter demain au marché ? ».',
+    // une ligne par étape : affichées sous « Mon rôle » sur la page projet
     solution: [
-      'Une application web utilisable sur téléphone : produits, approvisionnements, ventes, dépenses, caisse et alertes de stock',
-      'Des accès différents pour le gérant et les vendeurs',
-      'Construite en développement assisté par IA avec Claude, sur Next.js, Supabase et Vercel',
+      'Cadrage : je suis parti du cahier et de l’Excel du commerce pour comprendre comment la vendeuse et le gérant travaillent vraiment, et ce qui faussait le bénéfice (remises, arrondis, prix d’achat).',
+      'Conception : deux profils dans la même application. La vendeuse saisit le cahier du soir au comptoir en quelques minutes ; le gérant consulte le lendemain matin, à distance, sa caisse, son stock et son bénéfice réel.',
+      'Développement : j’ai piloté la construction en développement assisté par IA avec Claude (Next.js, Supabase, Vercel). Je définis chaque écran, je teste et je recette avant chaque mise en ligne.',
+      'Données : chaque franc a une origine (soldes calculés, bon d’achat de marchandise, écarts de prix fournisseur) et chaque profil ne voit que ce qui le concerne, garanti par la base de données.',
+      'Suivi : l’application est en production. Je la fais évoluer avec la famille, comme un chef de projet côté métier.',
     ].join('\n'),
     result:
-      'Le stock, les ventes et la caisse sont consultables à tout moment, y compris à distance. Le gérant sait chaque soir ce qui a été vendu, ce qui reste en rayon et ce qu’il y a réellement en caisse.',
-    // visuels de présentation de l'application (public/captures/marche-ya-cina) : le texte est dans l'image
+      'Le cahier du soir se saisit en quelques minutes, même en cas de coupure réseau. Le lendemain matin, le gérant voit ce qui a été encaissé, ce qui manque en rayon et ce qu’il a réellement gagné, sans être sur place.',
+    // couverture puis visuels de présentation (public/captures/marche-ya-cina) : le texte est dans l'image
     files: [
       { url: '/captures/marche-ya-cina/icone.png', name: 'Icône de Marché ya Cina', kind: 'image', icon: true },
-      { url: '/captures/marche-ya-cina/ventes.webp', name: 'Ventes : suivre ses ventes en temps réel', kind: 'image', width: 1672, height: 941 },
-      { url: '/captures/marche-ya-cina/caisse.webp', name: 'Caisse : gérer ses encaissements au quotidien', kind: 'image', width: 1672, height: 941 },
-      { url: '/captures/marche-ya-cina/pilotage.webp', name: 'Pilotage : analyser ses performances en un coup d’œil', kind: 'image', width: 1672, height: 941 },
+      { url: '/captures/marche-ya-cina/couverture.webp', name: 'Marché ya Cina', kind: 'image', width: 1600, height: 1000 },
+      { url: '/captures/marche-ya-cina/encaisse-mois.webp', name: 'Encaissé du mois, jour par jour', kind: 'image', width: 2400, height: 1350 },
+      { url: '/captures/marche-ya-cina/presentation.webp', name: 'Présentation de l’application : profils, parcours, caisse et stock', kind: 'image', width: 2400, height: 1350 },
+      { url: '/captures/marche-ya-cina/encaisse-jour.webp', name: 'Encaissé du jour et objectif', kind: 'image', width: 2400, height: 1350 },
     ],
-  },
-  {
-    id: 'cartographie-si',
-    visual: 'carte',
-    title: 'Cartographie des outils',
-    subtitle: 'Y voir clair dans les outils de 18 directions régionales',
-    sector: 'Ministère de la Culture · Service du numérique',
-    role: 'Chef de projet SI',
-    period: '2025 – 2026',
-    tags: ['ÉTUDE STRATÉGIQUE', 'CARTOGRAPHIE SI', 'RATIONALISATION'],
-    stack: ['Cartographie SI', 'BPMN'],
-    problem: 'Des dizaines d’outils utilisés sans vue d’ensemble, des doublons, des fichiers maison que personne ne maîtrise.',
-    solution: [
-      'Étude stratégique pour un programme de rationalisation et de digitalisation des outils des services régionaux',
-      'Cartographie des applications et des processus de 18 directions régionales',
-      'Repérage des outils utilisés hors cadre et des doublons',
-    ].join('\n'),
-    result:
-      'Une vue d’ensemble des applications et des processus des 18 directions régionales, doublons et outils hors cadre compris : la base du programme de rationalisation.',
-    files: [],
   },
   {
     id: 'ged-salesforce',

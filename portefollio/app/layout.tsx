@@ -3,23 +3,28 @@ import '@fontsource/outfit/400.css';
 import '@fontsource/outfit/500.css';
 import '@fontsource/outfit/600.css';
 import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/archivo/500.css';
+import '@fontsource/archivo/600.css';
+import '@fontsource/archivo/700.css';
+import '@fontsource/archivo/800.css';
 import './globals.css';
-import { SITE_NAME, SITE_URL } from '@/lib/config';
+import { SITE_URL } from '@/lib/config';
+import { FREELANCE_NAME, FREELANCE_PITCH, FREELANCE_ROLE } from '@/lib/freelance';
 
-const title = `${SITE_NAME} · Chef de projet SI & Product builder`;
-const description =
-  'Chef de projet SI et product builder à Paris : cartographie des outils et des processus, automatisation, intégration (API, données) et IA générative, du cadrage au déploiement.';
+const title = `${FREELANCE_NAME} · ${FREELANCE_ROLE}`;
+const description = FREELANCE_PITCH;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: title, template: `%s · ${SITE_NAME}` },
+  title: { default: title, template: `%s · ${FREELANCE_NAME}` },
   description,
   alternates: { canonical: '/' },
-  openGraph: { type: 'website', locale: 'fr_FR', url: '/', siteName: SITE_NAME, title, description },
+  openGraph: { type: 'website', locale: 'fr_FR', url: '/', siteName: FREELANCE_NAME, title, description },
   twitter: { card: 'summary_large_image', title, description },
 };
 
-export const viewport: Viewport = { themeColor: '#151514', colorScheme: 'dark' };
+// barre du navigateur mobile aux couleurs du site
+export const viewport: Viewport = { themeColor: '#dc1230', colorScheme: 'light' };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

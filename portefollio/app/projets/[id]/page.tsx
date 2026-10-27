@@ -1,14 +1,11 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import Gallery from '@/components/Gallery';
-import { visualStyle } from '@/components/ProjectCard';
 import Shell from '@/components/Shell';
-import { CONTACT_EMAIL } from '@/lib/config';
+import { FREELANCE_EMAIL, FREELANCE_NAME } from '@/lib/freelance';
 import { lines, pad, projectHref } from '@/lib/format';
 import { getProjects } from '@/lib/store';
-import type { Project } from '@/lib/types';
-import { projectMedia, visualSrc } from '@/lib/visuals';
+import { onFreelance, projectMedia, visualSrc } from '@/lib/visuals';
 
 // Pages statiques, régénérées avec la page d'accueil quand un projet est enregistré
 export const revalidate = 3600;
@@ -32,15 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function PagerLink({ project, label, className }: { project: Project; label: string; className?: string }) {
-  return (
-    <a className={`pager-link ${className ?? ''}`} href={projectHref(project.id)}>
-      <Image src={projectMedia(project).icon ?? visualSrc(project)} alt="" width={64} height={64} />
-      <span><span className="label">{label}</span><strong>{project.title}</strong></span>
-    </a>
-  );
-}
-
+// Une page par projet : à gauche le texte reste en place (retour, titre, récit, fiche),
+// à droite les écrans défilent en grand, les uns sous les autres.
 export default async function ProjectPage({ params }: Props) {
   const { id } = await params;
   const projects = await getProjects();
@@ -48,11 +38,12 @@ export default async function ProjectPage({ params }: Props) {
   if (index < 0) notFound();
 
   const p = projects[index];
-  const prev = projects[index - 1];
-  const next = projects[index + 1];
+  // numérotation et projet suivant dans le même groupe : réalisations (accueil) ou missions (parcours)
+  const group = projects.filter((x) => onFreelance(x) === onFreelance(p));
+  const at = group.findIndex((x) => x.id === p.id);
+  const next = group[(at + 1) % group.length];
   const steps = lines(p.solution);
   const media = projectMedia(p);
-  const bg = visualStyle(media.color, index);
   const pdfs = p.files.filter((f) => f.kind === 'pdf');
   const facts = [
     ['Rôle', p.role],
@@ -62,84 +53,74 @@ export default async function ProjectPage({ params }: Props) {
   ].filter((f): f is [string, string] => !!f[1]);
 
   return (
-    <Shell active="Projets">
-      <article className="sheet">
-        <p className="back"><a className="hotspot back-link" href="/#projets"><i aria-hidden="true" />Tous les projets</a></p>
+    <Shell owner={FREELANCE_NAME} email={FREELANCE_EMAIL}>
+      <article className="case">
+        <aside className="case-text">
+          <a className="case-back" href={onFreelance(p) ? '/#projets' : '/parcours#missions'}><span aria-hidden="true">←</span> Retour</a>
+          <p className="label">{onFreelance(p) ? 'Réalisation' : 'Mission'} {pad(at + 1)} / {pad(group.length)}{p.sector && ` · ${p.sector}`}</p>
+          <h1 className="case-title">{p.title}</h1>
+          {p.subtitle && <p className="case-sub">{p.subtitle}</p>}
 
-        {/* sans écran, l'objet 3D est déjà en grand dans la scène : pas de doublon dans l'en-tête */}
-        <header className="sheet-head">
-          {media.icon && <Image className="sheet-logo" src={media.icon} alt="" width={160} height={160} priority />}
-          <p className="label">Projet {pad(index + 1)} / {pad(projects.length)} · {p.sector}</p>
-          <h1 className="title">{p.title}{/[.!?]$/.test(p.title) ? '' : '.'}{p.subtitle && <span> {p.subtitle}</span>}</h1>
-        </header>
+          <div className="case-body">
+            {p.problem && <section><h2 className="label">Le besoin</h2><p>{p.problem}</p></section>}
+            {steps.length > 0 && (
+              <section>
+                <h2 className="label">Mon rôle</h2>
+                {steps.length > 1 ? <ul>{steps.map((s) => <li key={s}>{s}</li>)}</ul> : <p>{steps[0]}</p>}
+              </section>
+            )}
+            {p.result && <section><h2 className="label">Le résultat</h2><p>{p.result}</p></section>}
+          </div>
 
-        {facts.length > 0 && (
-          <dl className="sheet-facts">
-            {facts.map(([k, v]) => <div key={k}><dt className="label">{k}</dt><dd>{v}</dd></div>)}
-          </dl>
-        )}
-        {p.tags.length > 0 && <ul className="bubbles sheet-tags">{p.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
-
-        <section className={`stage ${bg.className}`} style={bg.style} aria-label={media.screens.length ? 'Écrans de l’application' : undefined}>
-          {media.screens.length > 0
-            ? <Gallery screens={media.screens} title={p.title} />
-            : <Image className="stage-3d" src={visualSrc(p)} alt="" width={640} height={640} sizes="(max-width: 640px) 60vw, 360px" priority />}
-        </section>
-
-        <div className="story">
-          {p.problem && (
-            <section className="story-row reveal">
-              <h2>Le problème</h2>
-              <p className="prose">{p.problem}</p>
-            </section>
+          {(facts.length > 0 || p.tags.length > 0) && (
+            <dl className="case-facts">
+              {facts.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
+              {p.tags.length > 0 && <div><dt>Compétences</dt><dd>{p.tags.join(', ')}</dd></div>}
+            </dl>
           )}
-          {steps.length > 0 && (
-            <section className="story-row reveal">
-              <h2>Ce que j’ai fait</h2>
-              {steps.length > 1
-                ? <ol className="steps">{steps.map((s) => <li key={s}>{s}</li>)}</ol>
-                : <p className="prose">{steps[0]}</p>}
-            </section>
+
+          <a className="btn pill case-cta" href="/#devis">Un projet du même type&nbsp;? <span aria-hidden="true">→</span></a>
+        </aside>
+
+        <div className="case-media">
+          {media.screens.length > 0 ? (
+            media.screens.map((s, i) => (
+              <figure key={s.url}>
+                <Image
+                  src={s.url}
+                  alt={s.title ? `${p.title}, ${s.title}` : s.name && !/\.\w{3,4}$/.test(s.name) ? `${p.title}, ${s.name}` : `${p.title}, capture ${i + 1}`}
+                  width={s.width ?? 1600}
+                  height={s.height ?? 1000}
+                  sizes="(max-width: 900px) 100vw, 56vw"
+                  priority={i === 0}
+                />
+                {(s.title || s.caption) && <figcaption>{s.title}{s.title && s.caption && ' · '}{s.caption}</figcaption>}
+              </figure>
+            ))
+          ) : (
+            // pas encore de capture : l'objet du projet sur un aplat
+            <figure className="case-placeholder">
+              <Image src={visualSrc(p)} alt="" width={640} height={640} sizes="40vw" priority />
+            </figure>
           )}
-          {p.result && (
-            <section className="story-result reveal">
-              <h2 className="label">Résultat</h2>
-              <p>{p.result}</p>
-            </section>
+          {pdfs.length > 0 && (
+            <ul className="case-docs">
+              {pdfs.map((f) => (
+                <li key={f.url}><a className="link" href={f.url} target="_blank" rel="noopener noreferrer">{f.name} ↗</a></li>
+              ))}
+            </ul>
           )}
         </div>
-
-        {pdfs.length > 0 && (
-          <section className="story-row">
-            <h2>Documents</h2>
-            <div>
-              {pdfs.map((f) => (
-                <div className="pdf" key={f.url}>
-                  <div className="pdf-head">
-                    <span>{f.name}</span>
-                    <a className="link" href={f.url} target="_blank" rel="noopener noreferrer">Ouvrir en plein écran ↗</a>
-                  </div>
-                  <iframe src={`${f.url}#view=FitH`} title={f.name} loading="lazy" />
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
       </article>
 
-      <nav className="pager" aria-label="Autres projets">
-        {prev ? <PagerLink project={prev} label="← Projet précédent" /> : <span />}
-        {next
-          ? <PagerLink project={next} label="Projet suivant →" className="next" />
-          : <a className="pager-link next" href="/#projets"><span><span className="label">Fin de la sélection</span><strong>Tous les projets</strong></span></a>}
-      </nav>
-
-      <section className="section contact project-cta">
-        <h2 className="contact-title">Un projet du même type&nbsp;?<span className="accent"> Parlons-en.</span></h2>
-        <div className="actions">
-          <a className="btn pill" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('À propos du projet ' + p.title)}`}>M’écrire <span aria-hidden="true">→</span></a>
-        </div>
-      </section>
+      {next && next.id !== p.id && (
+        <nav className="case-next" aria-label="Projet suivant">
+          <a href={projectHref(next.id)}>
+            <span className="label">{onFreelance(p) ? 'Réalisation suivante' : 'Mission suivante'}</span>
+            <strong>{next.title} <span aria-hidden="true">→</span></strong>
+          </a>
+        </nav>
+      )}
     </Shell>
   );
 }

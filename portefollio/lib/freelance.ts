@@ -1,4 +1,4 @@
-// Contenu de la page freelance (/freelance) : adressée aux clients, reliée nulle part depuis le portfolio.
+// Contenu de la page d'accueil, adressée aux clients.
 
 import type { Step } from './profile';
 
@@ -9,7 +9,7 @@ export const FREELANCE_ROLE = 'Product builder';
 export const FREELANCE_PITCH =
   'Je suis Malcolm, product builder. Je conçois et je construis les applications et les outils dont votre activité a besoin, du premier échange à la mise en ligne.';
 
-// Ce que je construis : [objet 3D de public/3d, titre, phrase]
+// Ce que je construis : [icône de components/Icon.tsx, titre, phrase]
 export const BUILDS: [string, string, string][] = [
   ['panier', 'Applications métier', 'Stock, caisse, ventes, suivi d’activité : une application web pensée pour votre façon de travailler, utilisable sur téléphone.'],
   ['carte', 'Tableaux de bord', 'Vos chiffres au même endroit, à jour et lisibles en un coup d’œil.'],

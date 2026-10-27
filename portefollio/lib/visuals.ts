@@ -39,7 +39,12 @@ export function visualSrc(project: Pick<Project, 'id' | 'title' | 'visual'>) {
 export function projectMedia(project: Project) {
   const seed = project.visual === undefined ? seedFor(project) : undefined;
   const own = project.files.filter((f) => f.kind === 'image');
-  const images = own.length ? own : (seed?.files.filter((f) => f.kind === 'image') ?? []);
+  // images livrées avec le site (public/) et non envoyées depuis l'admin : on suit toujours le contenu de départ,
+  // pour qu'un changement de visuels dans lib/seed.ts s'affiche sans réimporter
+  const shippedOnly = own.length > 0 && own.every((f) => !f.url.startsWith('/api/file/'));
+  const base = shippedOnly ? seedFor(project) : seed;
+  const fromSeed = base?.files.filter((f) => f.kind === 'image') ?? [];
+  const images = own.length && !shippedOnly ? own : fromSeed.length ? fromSeed : own;
   const screens = images.filter((f) => !f.icon);
   return {
     icon: images.find((f) => f.icon)?.url,

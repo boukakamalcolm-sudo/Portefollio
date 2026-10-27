@@ -62,7 +62,7 @@ export default async function ProjectPage({ params }: Props) {
             {p.problem && <section><h2 className="label">Le besoin</h2><p>{p.problem}</p></section>}
             {steps.length > 0 && (
               <section>
-                <h2 className="label">Ce que j’ai construit</h2>
+                <h2 className="label">Mon rôle</h2>
                 {steps.length > 1 ? <ul>{steps.map((s) => <li key={s}>{s}</li>)}</ul> : <p>{steps[0]}</p>}
               </section>
             )}

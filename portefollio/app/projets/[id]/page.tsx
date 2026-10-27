@@ -5,7 +5,7 @@ import Shell from '@/components/Shell';
 import { FREELANCE_EMAIL, FREELANCE_NAME } from '@/lib/freelance';
 import { lines, pad, projectHref } from '@/lib/format';
 import { getProjects } from '@/lib/store';
-import { projectMedia, visualSrc } from '@/lib/visuals';
+import { onFreelance, projectMedia, visualSrc } from '@/lib/visuals';
 
 // Pages statiques, régénérées avec la page d'accueil quand un projet est enregistré
 export const revalidate = 3600;
@@ -38,7 +38,10 @@ export default async function ProjectPage({ params }: Props) {
   if (index < 0) notFound();
 
   const p = projects[index];
-  const next = projects[(index + 1) % projects.length];
+  // numérotation et projet suivant dans le même groupe : réalisations (accueil) ou missions (parcours)
+  const group = projects.filter((x) => onFreelance(x) === onFreelance(p));
+  const at = group.findIndex((x) => x.id === p.id);
+  const next = group[(at + 1) % group.length];
   const steps = lines(p.solution);
   const media = projectMedia(p);
   const pdfs = p.files.filter((f) => f.kind === 'pdf');
@@ -53,8 +56,8 @@ export default async function ProjectPage({ params }: Props) {
     <Shell owner={FREELANCE_NAME} email={FREELANCE_EMAIL}>
       <article className="case">
         <aside className="case-text">
-          <a className="case-back" href="/#projets"><span aria-hidden="true">←</span> Retour</a>
-          <p className="label">Projet {pad(index + 1)} / {pad(projects.length)}{p.sector && ` · ${p.sector}`}</p>
+          <a className="case-back" href={onFreelance(p) ? '/#projets' : '/parcours#missions'}><span aria-hidden="true">←</span> Retour</a>
+          <p className="label">{onFreelance(p) ? 'Réalisation' : 'Mission'} {pad(at + 1)} / {pad(group.length)}{p.sector && ` · ${p.sector}`}</p>
           <h1 className="case-title">{p.title}</h1>
           {p.subtitle && <p className="case-sub">{p.subtitle}</p>}
 
@@ -113,7 +116,7 @@ export default async function ProjectPage({ params }: Props) {
       {next && next.id !== p.id && (
         <nav className="case-next" aria-label="Projet suivant">
           <a href={projectHref(next.id)}>
-            <span className="label">Projet suivant</span>
+            <span className="label">{onFreelance(p) ? 'Réalisation suivante' : 'Mission suivante'}</span>
             <strong>{next.title} <span aria-hidden="true">→</span></strong>
           </a>
         </nav>

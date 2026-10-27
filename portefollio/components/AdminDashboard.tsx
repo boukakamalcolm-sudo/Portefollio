@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Project, ProjectFile } from '@/lib/types';
 import { projectHref } from '@/lib/format';
-import { projectMedia, VISUALS, visualSrc } from '@/lib/visuals';
+import { onFreelance, projectMedia, VISUALS, visualSrc } from '@/lib/visuals';
 
 const empty = (): Project => ({
   id: '',
@@ -97,7 +97,7 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
   onSaved: (p: Project[]) => void;
   uploads: React.MutableRefObject<string[]>;
 }) {
-  const [p, setP] = useState<Project>(initial);
+  const [p, setP] = useState<Project>({ ...initial, freelance: onFreelance(initial) });
   const [tags, setTags] = useState(initial.tags.join(', '));
   const [stack, setStack] = useState((initial.stack ?? []).join(', '));
   const [uploading, setUploading] = useState<string | null>(null);
@@ -194,6 +194,10 @@ function Editor({ initial, onCancel, onSaved, uploads }: {
           </span>
         </label>
       </div>
+      <label className="editor-check">
+        <input type="checkbox" checked={!!p.freelance} onChange={(e) => setP({ ...p, freelance: e.target.checked })} />
+        Réalisation client : afficher sur l’accueil (sinon : mission, sur la page parcours)
+      </label>
       <label>Tags (séparés par des virgules)<input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="CADRAGE, DONNÉES, DÉPLOIEMENT" /></label>
       <label>Outils (séparés par des virgules)<input value={stack} onChange={(e) => setStack(e.target.value)} placeholder="Jira, BPMN, Power Automate" /></label>
       <div className="editor-visual">
@@ -333,7 +337,7 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
         <span className="label">Espace admin</span>
         <div className="admin-head-actions">
           <a className="link" href="/" target="_blank" rel="noopener noreferrer">Voir le site ↗</a>
-          <a className="link" href="/cv" target="_blank" rel="noopener noreferrer">Page CV ↗</a>
+          <a className="link" href="/parcours" target="_blank" rel="noopener noreferrer">Page parcours ↗</a>
           <button className="link" onClick={logout}>Déconnexion</button>
         </div>
       </header>
@@ -379,7 +383,7 @@ export default function AdminDashboard({ initialProjects, blobReady }: { initial
                     <img src={cover ?? visualSrc(p)} alt="" className={`admin-thumb${cover ? '' : ' is-3d'}`} />
                     <div className="admin-item">
                       <strong><a href={projectHref(p.id)} target="_blank" rel="noopener noreferrer">{p.title} ↗</a></strong>
-                      <small>{p.sector || 'Sans contexte'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}</small>
+                      <small>{p.sector || 'Sans contexte'} · {p.files.length} fichier{p.files.length > 1 ? 's' : ''}{onFreelance(p) ? ' · accueil' : ' · parcours'}</small>
                     </div>
                     <div className="row-actions">
                       <button onClick={() => move(i, -1)} disabled={busy || i === 0} aria-label={`Monter ${p.title}`}>↑</button>

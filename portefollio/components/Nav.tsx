@@ -15,6 +15,7 @@ const PORTFOLIO: NavConfig = {
     ['/#projets', 'Projets'],
     ['/#construire', 'Ce que je fais'],
     ['/#methode', 'Méthode'],
+    ['/parcours', 'Parcours'],
   ],
   cta: ['/#devis', 'Demander un devis'],
 };

@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
     return [
       // l'ancienne page freelance est devenue l'accueil
       { source: '/freelance', destination: '/', permanent: true },
+      { source: '/cv', destination: '/parcours', permanent: true },
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'portefollio.vercel.app' }],

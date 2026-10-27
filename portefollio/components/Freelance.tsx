@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { onFreelance } from '@/lib/visuals';
 import type { Project } from '@/lib/types';
 import { LINKEDIN_URL, LOCATION } from '@/lib/config';
 import { BUILDS, FREELANCE_ABOUT, FREELANCE_EMAIL, FREELANCE_METHOD, FREELANCE_NAME, FREELANCE_PITCH, FREELANCE_ROLE } from '@/lib/freelance';
@@ -10,8 +11,10 @@ import QuoteForm from './QuoteForm';
 import Shell from './Shell';
 
 // Page d'accueil : offre product builder, projets (une page chacun), méthode, demande de devis.
-// Le parcours détaillé est sur /cv.
-export default function Freelance({ projects }: { projects: Project[] }) {
+// Le parcours et les missions en entreprise sont sur /parcours (lien dans l'en-tête).
+export default function Freelance({ projects: all }: { projects: Project[] }) {
+  // réalisations pour des clients ; les missions en entreprise sont sur /parcours
+  const projects = all.filter(onFreelance);
   return (
     <Shell owner={FREELANCE_NAME} email={FREELANCE_EMAIL}>
       <section className="hero" aria-labelledby="hero-title">
@@ -62,7 +65,6 @@ export default function Freelance({ projects }: { projects: Project[] }) {
           <div className="about-text">
             <h2 id="regard-title" className="title">Un regard projet.<span> Pas seulement du code.</span></h2>
             <p>{FREELANCE_ABOUT}</p>
-            <p><a className="link" href="/cv">Voir mon parcours <span aria-hidden="true">→</span></a></p>
           </div>
         </div>
       </section>

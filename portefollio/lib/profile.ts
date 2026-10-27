@@ -50,7 +50,7 @@ export const XP: Experience[] = [
       ['Ancrer', 'Guides utilisateurs et accompagnement de chaque musée, une cinquantaine au total.'],
     ],
     skills: ['Cartographie SI', 'BPMN', 'Modélisation de données', 'Échanges CSV', 'Jira', 'Recette', 'Déploiement', 'Conduite du changement'],
-    projects: ['indicateurs-musees', 'cartographie-si'],
+    projects: ['indicateurs-musees'],
   },
   {
     id: 'covea',

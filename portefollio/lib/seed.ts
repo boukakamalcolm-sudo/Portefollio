@@ -83,26 +83,6 @@ export const seedProjects: Project[] = [
     ],
   },
   {
-    id: 'cartographie-si',
-    visual: 'carte',
-    title: 'Cartographie des outils',
-    subtitle: 'Y voir clair dans les outils de 18 directions régionales',
-    sector: 'Ministère de la Culture · Service du numérique',
-    role: 'Chef de projet SI',
-    period: '2025 – 2026',
-    tags: ['ÉTUDE STRATÉGIQUE', 'CARTOGRAPHIE SI', 'RATIONALISATION'],
-    stack: ['Cartographie SI', 'BPMN'],
-    problem: 'Des dizaines d’outils utilisés sans vue d’ensemble, des doublons, des fichiers maison que personne ne maîtrise.',
-    solution: [
-      'Étude stratégique pour un programme de rationalisation et de digitalisation des outils des services régionaux',
-      'Cartographie des applications et des processus de 18 directions régionales',
-      'Repérage des outils utilisés hors cadre et des doublons',
-    ].join('\n'),
-    result:
-      'Une vue d’ensemble des applications et des processus des 18 directions régionales, doublons et outils hors cadre compris : la base du programme de rationalisation.',
-    files: [],
-  },
-  {
     id: 'ged-salesforce',
     visual: 'dossier',
     title: 'GED × Salesforce',

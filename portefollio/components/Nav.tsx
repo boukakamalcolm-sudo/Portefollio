@@ -13,10 +13,10 @@ const PORTFOLIO: NavConfig = {
   home: '/',
   links: [
     ['/#projets', 'Projets'],
+    ['/#construire', 'Ce que je fais'],
     ['/#methode', 'Méthode'],
-    ['/#parcours', 'Parcours'],
   ],
-  cta: ['/#contact', 'Me contacter'],
+  cta: ['/#devis', 'Demander un devis'],
 };
 
 // En-tête fixe : nom à gauche, liens discrets et pilule de contact à droite.

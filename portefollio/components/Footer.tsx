@@ -5,6 +5,7 @@ export default function Footer({ name = LEGAL_NAME, email = CONTACT_EMAIL }: { n
   return (
     <footer className="footer">
       <span>© {new Date().getFullYear()} {name}</span>
+      <a href="/cv">Parcours</a>
       <a href="/mentions-legales">Mentions légales</a>
       <span className="footer-links">
         {LINKEDIN_URL && <><a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">LinkedIn</a>, </>}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Asterisk from './Asterisk';
+import Icon from './Icon';
 import { FREELANCE_EMAIL, QUOTE_DEADLINES, QUOTE_TYPES } from '@/lib/freelance';
 
 // espace insécable avant « ? » : le point d'interrogation ne part jamais seul à la ligne
@@ -79,10 +80,10 @@ export default function QuoteForm() {
         {step === 0 && (
           <fieldset className="quote-choices types">
             <legend className="sr-only">{STEPS[0]}</legend>
-            {QUOTE_TYPES.map(([, label]) => (
+            {QUOTE_TYPES.map(([icon, label]) => (
               <label key={label} className="quote-choice">
                 <input type="radio" name="type" value={label} required checked={data.type === label} onChange={set('type')} />
-                <span className="choice-icon"><Asterisk /></span>
+                <span className="choice-icon"><Icon name={icon} /></span>
                 <span>{label}</span>
               </label>
             ))}

@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
   // ancienne adresse du site : redirection permanente vers la nouvelle
   async redirects() {
     return [
+      // l'ancienne page freelance est devenue l'accueil
+      { source: '/freelance', destination: '/', permanent: true },
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'portefollio.vercel.app' }],

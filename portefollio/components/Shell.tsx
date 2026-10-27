@@ -3,9 +3,8 @@ import Footer from './Footer';
 import Nav, { type NavConfig } from './Nav';
 
 // Mise en page commune : en-tête fixe, contenu pleine largeur, pied de page sur une ligne.
-// La page freelance passe son propre en-tête et son nom pour ne renvoyer nulle part vers le portfolio.
-// `theme` enveloppe toute la page dans une classe de thème (ex. « da-rouge » pour la page freelance).
-export default function Shell({ active, nav, owner, email, theme, children }: {
+// `theme` enveloppe toute la page dans une classe de thème : la DA rouge par défaut.
+export default function Shell({ active, nav, owner, email, theme = 'da-rouge', children }: {
   active?: string;
   nav?: NavConfig;
   owner?: string;

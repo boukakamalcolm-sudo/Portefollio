@@ -1,47 +1,19 @@
 import Image from 'next/image';
 import type { Project } from '@/lib/types';
 import { LINKEDIN_URL, LOCATION } from '@/lib/config';
-import { lines } from '@/lib/format';
 import { BUILDS, FREELANCE_ABOUT, FREELANCE_EMAIL, FREELANCE_METHOD, FREELANCE_NAME, FREELANCE_PITCH, FREELANCE_ROLE } from '@/lib/freelance';
-import { onFreelance, projectMedia, visualSrc } from '@/lib/visuals';
 import Asterisk from './Asterisk';
-import Cases, { type Case } from './Cases';
+import Icon from './Icon';
 import Method from './Method';
+import ProjectStrip from './ProjectStrip';
 import QuoteForm from './QuoteForm';
-import { visualStyle } from './ProjectCard';
 import Shell from './Shell';
 
-// liens internes à la page uniquement : rien ne renvoie vers le portfolio
-const NAV = {
-  home: '#contenu',
-  links: [
-    ['#construire', 'Ce que je fais'],
-    ['#realisation', 'Réalisations'],
-    ['#methode', 'Méthode'],
-  ],
-  cta: ['#devis', 'Demander un devis'],
-} as const;
-
+// Page d'accueil : offre product builder, projets (une page chacun), méthode, demande de devis.
+// Le parcours détaillé est sur /cv.
 export default function Freelance({ projects }: { projects: Project[] }) {
-  // projets cochés « page freelance » dans l'admin, dans l'ordre du portfolio
-  const cases: Case[] = projects.filter(onFreelance).map((p, i) => {
-    const media = projectMedia(p);
-    return {
-      id: p.id,
-      title: p.title,
-      subtitle: p.subtitle,
-      status: media.status,
-      icon: media.icon ?? visualSrc(p),
-      screens: media.screens,
-      bg: visualStyle(media.color, i),
-      problem: p.problem,
-      steps: lines(p.solution),
-      result: p.result,
-    };
-  });
-
   return (
-    <Shell nav={NAV} owner={FREELANCE_NAME} email={FREELANCE_EMAIL} theme="da-rouge">
+    <Shell owner={FREELANCE_NAME} email={FREELANCE_EMAIL}>
       <section className="hero" aria-labelledby="hero-title">
         <p className="hero-badge">
           <Asterisk />
@@ -58,27 +30,27 @@ export default function Freelance({ projects }: { projects: Project[] }) {
           <p className="hero-role">{FREELANCE_PITCH}</p>
           <div className="actions hero-actions">
             <a className="btn pill" href="#devis">Demander un devis <span aria-hidden="true">→</span></a>
-            {cases.length > 0 && <a className="btn pill ghost" href="#realisation">Voir une réalisation</a>}
+            {projects.length > 0 && <a className="btn pill ghost" href="#projets">Voir les projets</a>}
           </div>
         </div>
       </section>
+
+      <ProjectStrip projects={projects} />
 
       <section className="section" id="construire" aria-labelledby="construire-title">
         <header className="section-head reveal">
           <h2 id="construire-title" className="title">Ce que je construis.<span> Des outils qui collent à votre activité.</span></h2>
         </header>
         <ul className="builds">
-          {BUILDS.map(([, title, text]) => (
+          {BUILDS.map(([icon, title, text]) => (
             <li key={title} className="reveal">
-              <span className="build-icon"><Asterisk /></span>
+              <span className="build-icon"><Icon name={icon} /></span>
               <h3>{title}</h3>
               <p>{text}</p>
             </li>
           ))}
         </ul>
       </section>
-
-      {cases.length > 0 && <Cases cases={cases} />}
 
       <Method title="Comment on travaille ensemble" texts={FREELANCE_METHOD} />
 
@@ -90,6 +62,7 @@ export default function Freelance({ projects }: { projects: Project[] }) {
           <div className="about-text">
             <h2 id="regard-title" className="title">Un regard projet.<span> Pas seulement du code.</span></h2>
             <p>{FREELANCE_ABOUT}</p>
+            <p><a className="link" href="/cv">Voir mon parcours <span aria-hidden="true">→</span></a></p>
           </div>
         </div>
       </section>

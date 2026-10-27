@@ -22,18 +22,18 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [{ protocol: 'https', hostname: '*.public.blob.vercel-storage.com' }],
   },
-  // ancienne adresse du site : redirection permanente vers la nouvelle
   async redirects() {
     return [
       // l'ancienne page freelance est devenue l'accueil
       { source: '/freelance', destination: '/', permanent: true },
       { source: '/cv', destination: '/parcours', permanent: true },
-      {
+      // anciennes adresses du site : redirection permanente vers la nouvelle
+      ...['portefollio.vercel.app', 'mb-conseil.vercel.app'].map((host) => ({
         source: '/:path*',
-        has: [{ type: 'host', value: 'portefollio.vercel.app' }],
-        destination: 'https://mb-conseil.vercel.app/:path*',
+        has: [{ type: 'host' as const, value: host }],
+        destination: 'https://malko-product.vercel.app/:path*',
         permanent: true,
-      },
+      })),
     ];
   },
   async headers() {

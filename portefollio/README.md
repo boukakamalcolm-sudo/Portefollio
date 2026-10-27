@@ -1,6 +1,6 @@
 # Portfolio Malcolm Boukaka
 
-En ligne : https://mb-conseil.vercel.app (l'ancienne adresse portefollio.vercel.app y redirige).
+En ligne : https://malko-product.vercel.app (les anciennes adresses mb-conseil.vercel.app et portefollio.vercel.app y redirigent).
 
 Portfolio (Next.js) de chef de projet SI et product builder. Chaque projet a sa page : `/projets/<identifiant>`.
 
